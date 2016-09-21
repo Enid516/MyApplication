@@ -5,12 +5,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 
+import cn.hth.igallery.Configuration;
 import cn.hth.igallery.R;
 import cn.hth.igallery.model.ImageModel;
 import cn.hth.igallery.util.ImageLoaderUtils;
@@ -22,16 +24,18 @@ import cn.hth.igallery.util.LogUtil;
  */
 public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.MyViewHolder>{
     private Context mContext;
-    private ArrayList<ImageModel> mDatas;
+    private ArrayList<ImageModel> mData;
     private OnItemOnClickListener mOnItemOnClickListener;
+    private Configuration mConfiguration;
 
     public interface OnItemOnClickListener {
         void onItemClick(View v,int position);
     }
 
-    public ImageGridAdapter(Context context, ArrayList<ImageModel> datas) {
+    public ImageGridAdapter(Context context, Configuration configuration) {
         this.mContext = context;
-        this.mDatas = datas;
+        this.mConfiguration = configuration;
+        this.mData = (ArrayList<ImageModel>) configuration.getImageList();
     }
 
     /**
@@ -54,22 +58,46 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.MyVi
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        ImageLoaderUtils.getInstance(mContext).displayImage(mDatas.get(position).getData(),holder.imageView);
-        holder.itemView.setTag(mDatas.get(position));
+        ImageLoaderUtils.getInstance(mContext).displayImage(mData.get(position).getData(),holder.imageView);
+        if (mConfiguration.getChoiceModel() == Configuration.ImageChoiceModel.MULTIPLE) {
+            holder.checkBox.setVisibility(View.VISIBLE);
+        } else {
+            holder.checkBox.setVisibility(View.INVISIBLE);
+        }
+        holder.itemView.setTag(mData.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return mDatas.size();
+        return mData.size();
+    }
+
+    class CheckBoxClickListener implements View.OnClickListener {
+        MyViewHolder myViewHolder;
+        public CheckBoxClickListener(MyViewHolder holder) {
+            this.myViewHolder = holder;
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (myViewHolder.checkBox.isSelected()) {
+                mConfiguration.addSelectImage(mData.get(myViewHolder.getAdapterPosition()));
+            } else {
+                mConfiguration.removeSelectImage(mData.get(myViewHolder.getAdapterPosition()));
+            }
+        }
     }
 
     class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         ImageView imageView;
+        CheckBox checkBox;
 
         public MyViewHolder(View itemView) {
             super(itemView);
             imageView = (ImageView) itemView.findViewById(R.id.image);
+            checkBox = (CheckBox) itemView.findViewById(R.id.checkbox_image);
             imageView.setOnClickListener(this);
+            checkBox.setOnClickListener(new CheckBoxClickListener(this));
         }
 
         @Override

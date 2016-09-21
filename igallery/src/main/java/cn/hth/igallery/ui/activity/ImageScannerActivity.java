@@ -11,6 +11,7 @@ import android.util.DisplayMetrics;
 
 import java.util.ArrayList;
 
+import cn.hth.igallery.Configuration;
 import cn.hth.igallery.R;
 import cn.hth.igallery.model.ImageModel;
 import cn.hth.igallery.ui.fragment.ImageGridFragment;
@@ -29,6 +30,9 @@ public class ImageScannerActivity extends FragmentActivity {
     private ImagePreviewFragment imagePreviewFragment;
     private ArrayList<ImageModel> mImageList;
 
+    public static final String EXTRA_CONFIGURATION = "extra_configuration";
+    private Configuration mConfiguration;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +43,7 @@ public class ImageScannerActivity extends FragmentActivity {
     }
 
     private void init() {
+        getIntentData();
         mScanner = new ImageScanner(this, new ImageScanner.ImageScannerCallBack() {
             @Override
             public void onCompleted(ArrayList<ImageModel> imageList) {
@@ -46,6 +51,13 @@ public class ImageScannerActivity extends FragmentActivity {
                 selectImageGridFragment();
             }
         });
+    }
+
+    private void getIntentData() {
+        LogUtil.d("-->>" + "getIntentData");
+        Bundle bundle = getIntent().getExtras();
+        mConfiguration = (Configuration) bundle.getSerializable(EXTRA_CONFIGURATION);
+        LogUtil.d("-->>" + "after getSerializable");
     }
 
     @Override
@@ -95,7 +107,8 @@ public class ImageScannerActivity extends FragmentActivity {
             imageGridFragment = new ImageGridFragment();
         }
         Bundle bundle = new Bundle();
-        bundle.putSerializable(ImageGridFragment.IMAGE_EXTRA, mImageList);
+        mConfiguration.setImageList(mImageList);
+        bundle.putSerializable(ImageGridFragment.EXTRA_CONFIGURATION,mConfiguration);
         imageGridFragment.setArguments(bundle);
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
@@ -132,5 +145,4 @@ public class ImageScannerActivity extends FragmentActivity {
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         return  metrics.widthPixels;
     }
-
 }

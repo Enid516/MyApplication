@@ -10,13 +10,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
-import android.widget.ListView;
 
-import java.util.ArrayList;
-
+import cn.hth.igallery.Configuration;
 import cn.hth.igallery.R;
-import cn.hth.igallery.model.ImageModel;
 import cn.hth.igallery.ui.activity.ImageScannerActivity;
 import cn.hth.igallery.ui.adapter.ImageGridAdapter;
 
@@ -24,7 +20,7 @@ import cn.hth.igallery.ui.adapter.ImageGridAdapter;
  * Created by Enid on 2016/9/7.
  */
 public class ImageGridFragment extends Fragment {
-    public static final String IMAGE_EXTRA = "imageList";
+    public static final String EXTRA_CONFIGURATION = "extra_configuration";
 
     @Nullable
     @Override
@@ -49,8 +45,8 @@ public class ImageGridFragment extends Fragment {
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
 
         //get data
-        ArrayList<ImageModel> images = (ArrayList<ImageModel>) getArguments().getSerializable(IMAGE_EXTRA);
-        ImageGridAdapter imageGridAdapter = new ImageGridAdapter(getContext(), images);
+        Configuration configuration = (Configuration) getArguments().getSerializable(EXTRA_CONFIGURATION);
+        ImageGridAdapter imageGridAdapter = new ImageGridAdapter(getContext(),configuration);
         recyclerView.setAdapter(imageGridAdapter);
 
         //register on item onclick listener

@@ -2,9 +2,7 @@ package com.example.enid.myapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -17,9 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import cn.hth.igallery.ui.activity.ImageScannerActivity;
-import cn.hth.igallery.util.LogUtil;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
                         intent = new Intent(MainActivity.this, ListViewAnalyse.class);
                         break;
                     case 3:
-                        intent = new Intent(MainActivity.this, ImageScannerActivity.class);
+                        intent = new Intent(MainActivity.this, ImageSelectActivity.class);
                         break;
                     case 4:
                         intent = new Intent(MainActivity.this, FragmentTabHostActivity.class);

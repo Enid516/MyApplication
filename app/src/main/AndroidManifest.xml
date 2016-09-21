@@ -23,7 +23,7 @@
         <activity android:name=".ScrollViewActivity"/>
         <activity android:name=".DividerListActivity"/>
         <activity android:name=".view.ListViewAnalyse"/>
-        <activity android:name="cn.hth.igallery.ui.activity.ImageScannerActivity"/>
+        <activity android:name=".ImageSelectActivity"/>
         <activity android:name=".fragmenttabhost.FragmentTabHostActivity"/>
     </application>
 

@@ -9,6 +9,7 @@
         android:allowBackup="true"
         android:label="@string/app_name"
         android:supportsRtl="true">
+        <activity android:name=".ui.activity.ImageScannerActivity"
+            android:screenOrientation="portrait"/>
     </application>
-
 </manifest>

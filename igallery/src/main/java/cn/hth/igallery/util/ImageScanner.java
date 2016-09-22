@@ -13,9 +13,12 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.hth.igallery.MediaScannerHelper;
 import cn.hth.igallery.media.MediaScanner;
 import cn.hth.igallery.model.BucketModel;
 import cn.hth.igallery.model.ImageModel;
+import rx.Observer;
+import rx.Subscription;
 
 /**
  * Created by Enid on 2016/9/7.
@@ -23,6 +26,8 @@ import cn.hth.igallery.model.ImageModel;
 public class ImageScanner {
     public static final int READ_EXTERNAL_STORAGE_REQUEST_CODE = 100;
     private ImageScannerCallBack mImageScannerCallBack;
+    private Subscription subscription;
+
     public ImageScanner(Activity context,ImageScannerCallBack imageScannerCallBack) {
         this.mImageScannerCallBack = imageScannerCallBack;
         scan(context);
@@ -58,14 +63,29 @@ public class ImageScanner {
         LogUtil.i("SD卡检测通过");
         MediaUtil.getBucketList(context);
 
-        ArrayList<ImageModel>  imageList = MediaUtil.getImages(context,1,Integer.MAX_VALUE);
-        if (imageList != null && mImageScannerCallBack != null) {
-            mImageScannerCallBack.onCompleted(imageList);
-        }
+        Observer<List<ImageModel>> observer = new Observer<List<ImageModel>>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(List<ImageModel> imageModels) {
+                if (imageModels != null && mImageScannerCallBack != null) {
+                    mImageScannerCallBack.onCompleted(imageModels);
+                }
+            }
+        };
+        MediaScannerHelper.generateImages(subscription,observer,context,1,Integer.MAX_VALUE);
     }
 
     public interface ImageScannerCallBack {
-        void onCompleted(ArrayList<ImageModel> imageList);
+        void onCompleted(List<ImageModel> imageList);
     }
 
 

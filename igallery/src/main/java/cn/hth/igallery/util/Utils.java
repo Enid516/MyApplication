@@ -1,7 +1,6 @@
 package cn.hth.igallery.util;
 
 import android.os.Environment;
-import android.widget.Toast;
 
 /**
  * Created by Enid on 2016/9/21.

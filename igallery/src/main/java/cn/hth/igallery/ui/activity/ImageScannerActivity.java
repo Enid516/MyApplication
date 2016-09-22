@@ -96,6 +96,24 @@ public class ImageScannerActivity extends FragmentActivity {
         alertDialog.show();
     }
 
+    private String[] fragmentTags = {"image_grid_fragment","image_preview_fragment"};
+    private Fragment mContent;
+    public void switchContent(Fragment from,Fragment to,int position) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        if (from == null) {
+            mContent = to;
+            ft.add(R.id.frame_image_scanner, to,fragmentTags[position]).commit();
+        }
+        if (mContent != to) {
+            mContent = to;
+            if (!to.isAdded()) {
+                ft.hide(from).add(R.id.frame_image_scanner, to,fragmentTags[position]).commit();
+            } else {
+                ft.hide(from).show(to).commit();
+            }
+        }
+    }
+
     /**
      * 选择显示ImageGridFragment
      */
@@ -105,17 +123,12 @@ public class ImageScannerActivity extends FragmentActivity {
             return;
         if (imageGridFragment == null) {
             imageGridFragment = new ImageGridFragment();
+            Bundle bundle = new Bundle();
+            mConfiguration.setImageList(mImageList);
+            bundle.putSerializable(ImageGridFragment.EXTRA_CONFIGURATION,mConfiguration);
+            imageGridFragment.setArguments(bundle);
         }
-        Bundle bundle = new Bundle();
-        mConfiguration.setImageList(mImageList);
-        bundle.putSerializable(ImageGridFragment.EXTRA_CONFIGURATION,mConfiguration);
-        imageGridFragment.setArguments(bundle);
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-
-        if (imagePreviewFragment != null)
-            ft.remove(imagePreviewFragment);
-        ft.add(R.id.frame_image_scanner, imageGridFragment);
-        ft.commit();
+        switchContent(mContent,imageGridFragment,0);
     }
 
     /**
@@ -127,16 +140,12 @@ public class ImageScannerActivity extends FragmentActivity {
             return;
         if (imagePreviewFragment == null) {
             imagePreviewFragment = new ImagePreviewFragment();
+            Bundle bundle = new Bundle();
+            bundle.putSerializable(ImagePreviewFragment.IMAGE_EXTRA, mImageList);
+            bundle.putInt(ImagePreviewFragment.IMAGE_CURRENT_INDEX_EXTRA,currentIndex);
+            imagePreviewFragment.setArguments(bundle);
         }
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(ImagePreviewFragment.IMAGE_EXTRA, mImageList);
-        bundle.putInt(ImagePreviewFragment.IMAGE_CURRENT_INDEX_EXTRA,currentIndex);
-        imagePreviewFragment.setArguments(bundle);
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        if (imagePreviewFragment != null)
-            ft.remove(imageGridFragment);
-        ft.add(R.id.frame_image_scanner, imagePreviewFragment);
-        ft.commit();
+        switchContent(mContent,imagePreviewFragment,1);
     }
 
 

@@ -15,6 +15,7 @@ import java.util.List;
 import cn.hth.igallery.Configuration;
 import cn.hth.igallery.R;
 import cn.hth.igallery.model.ImageModel;
+import cn.hth.igallery.ui.fragment.ImageChoiceStatusFragment;
 import cn.hth.igallery.ui.fragment.ImageGridFragment;
 import cn.hth.igallery.ui.fragment.ImagePreviewFragment;
 import cn.hth.igallery.util.ImageScanner;
@@ -27,6 +28,7 @@ public class ImageScannerActivity extends FragmentActivity {
 
     private ImageScanner mScanner;
     private Activity mContext;
+    private ImageChoiceStatusFragment imageChoiceStatusFragment;
     private ImageGridFragment imageGridFragment;
     private ImagePreviewFragment imagePreviewFragment;
     private List<ImageModel> mImageList;
@@ -45,6 +47,7 @@ public class ImageScannerActivity extends FragmentActivity {
 
     private void init() {
         getIntentData();
+        initImageStatusFragment();
         mScanner = new ImageScanner(this, new ImageScanner.ImageScannerCallBack() {
             @Override
             public void onCompleted(List<ImageModel> imageList) {
@@ -112,6 +115,14 @@ public class ImageScannerActivity extends FragmentActivity {
             } else {
                 ft.hide(from).show(to).commit();
             }
+        }
+    }
+
+    public void initImageStatusFragment() {
+        if (imageChoiceStatusFragment == null) {
+            imageChoiceStatusFragment = new ImageChoiceStatusFragment();
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.add(R.id.frame_image_choice_status, imageChoiceStatusFragment).commit();
         }
     }
 

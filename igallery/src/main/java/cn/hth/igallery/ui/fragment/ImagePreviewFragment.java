@@ -25,7 +25,7 @@ import cn.hth.igallery.util.LogUtil;
  * 图片预览类
  * Created by Enid on 2016/9/12.
  */
-public class ImagePreviewFragment extends Fragment implements View.OnClickListener{
+public class ImagePreviewFragment extends Fragment{
     public static final String IMAGE_EXTRA = "imageList";
     public static final String IMAGE_CURRENT_INDEX_EXTRA = "imageCurrentIndex";
     @Nullable
@@ -43,9 +43,6 @@ public class ImagePreviewFragment extends Fragment implements View.OnClickListen
     private void init(View view) {
         //init view
         ViewPager viewPager = (ViewPager) view.findViewById(R.id.viewpager_frag_image_preview);
-        TextView tvCount = (TextView) view.findViewById(R.id.tv_count_frag_image_preview);
-        view.findViewById(R.id.btn_back_frag_image_preview).setOnClickListener(this);
-        view.findViewById(R.id.btn_complete_frag_image_preview).setOnClickListener(this);
 
         //list view
         final ArrayList<ImageModel> imageList = (ArrayList<ImageModel>) getArguments().getSerializable(IMAGE_EXTRA);
@@ -84,12 +81,4 @@ public class ImagePreviewFragment extends Fragment implements View.OnClickListen
         });
         viewPager.setCurrentItem(imageIndex);
     }
-
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.btn_back_frag_image_preview) {
-            ((ImageScannerActivity)getActivity()).selectImageGridFragment();
-        }
-    }
-
 }

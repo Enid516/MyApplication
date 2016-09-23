@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.hth.igallery.model.ImageModel;
+import cn.hth.igallery.util.LogUtil;
 
 /**
  * Created by Enid on 2016/9/21.
@@ -16,9 +17,9 @@ public class Configuration implements Serializable{
     private Context context;
     private int maxChoiceSize = 1;
     /** the selected image list*/
-    private ArrayList<ImageModel> selectedList;
+    private List<ImageModel> selectedList;
     /** the all image list*/
-    private ArrayList<ImageModel> imageList;
+    private List<ImageModel> imageList;
 
     public enum ImageChoiceModel implements Serializable{
         SINGLE,
@@ -63,7 +64,7 @@ public class Configuration implements Serializable{
         return imageList;
     }
 
-    public void setImageList(ArrayList<ImageModel> imageList) {
+    public void setImageList(List<ImageModel> imageList) {
         this.imageList = imageList;
     }
 

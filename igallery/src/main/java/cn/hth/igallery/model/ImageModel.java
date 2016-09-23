@@ -10,7 +10,10 @@ public class ImageModel implements Serializable{
     private static final long serialVersionUID = -1;
     private String id;
     private String title;
-    private String data;
+    private String originalPath;
+
+    //大缩略图
+    private String thumbnailBigPath;
     //小缩略图
     private String thumbnailSmallPath;
 
@@ -30,12 +33,20 @@ public class ImageModel implements Serializable{
         this.title = title;
     }
 
-    public String getData() {
-        return data;
+    public String getOriginalPath() {
+        return originalPath;
     }
 
-    public void setData(String data) {
-        this.data = data;
+    public void setOriginalPath(String originalPath) {
+        this.originalPath = originalPath;
+    }
+
+    public String getThumbnailBigPath() {
+        return thumbnailBigPath;
+    }
+
+    public void setThumbnailBigPath(String thumbnailBigPath) {
+        this.thumbnailBigPath = thumbnailBigPath;
     }
 
     public String getThumbnailSmallPath() {

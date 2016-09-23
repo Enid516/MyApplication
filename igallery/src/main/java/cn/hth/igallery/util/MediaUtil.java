@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,17 +42,7 @@ public class MediaUtil {
         if (cursor != null) {
             if (cursor.moveToFirst()) {
                 do {
-                    ImageModel image = new ImageModel();
-                    String id = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media._ID));
-                    String title = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.TITLE));
-                    String data = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
-                    image.setId(id);
-                    image.setTitle(title);
-                    image.setData(data);
-                    LogUtil.i("-->" + id);
-                    LogUtil.i("-->" + title);
-                    LogUtil.i("-->" + data);
-                    imageList.add(image);
+                    imageList.add(parseCursorCreateThumbnail(context, cursor));
                 } while (cursor.moveToNext());
                 if (!cursor.isClosed()) {
                     cursor.close();
@@ -64,6 +55,8 @@ public class MediaUtil {
 
     /**
      * 获取所有的media文件夹
+     * 获取存储卡中Image文件的文件夹相关信息
+     * 添加bucket到列表中，已经存在的bucket信息不再添加
      *
      * @return
      */
@@ -101,6 +94,8 @@ public class MediaUtil {
                     if (TextUtils.isEmpty(allImage.getCover())) {
                         allImage.setCover(data);
                     }
+
+                    //判断bucketList 中是否已经存在当前目录文件
                     if (bucketList.contains(bucket)) {
                         continue;
                     }
@@ -123,4 +118,44 @@ public class MediaUtil {
         }
         return bucketList;
     }
+
+    /**
+     * 解析Cursor生成ImageModel,并且生成缩略图信息
+     *
+     * @param context
+     * @param cursor
+     * @return
+     */
+    public static ImageModel parseCursorCreateThumbnail(Context context, Cursor cursor) {
+        ImageModel image = new ImageModel();
+        String id = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media._ID));
+        String title = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.TITLE));
+        String data = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+        image.setId(id);
+        image.setTitle(title);
+        image.setOriginalPath(data);
+
+        //缩略图信息
+        String name = FilenameUtils.getName(data);
+        File thumbnailBig = createThumbnailBigFileName(context,data);
+        File thumbnailSmall = createThumbnailSmallFileName(context,data);
+        image.setThumbnailBigPath(thumbnailBig.getAbsolutePath());
+        image.setThumbnailSmallPath(thumbnailSmall.getAbsolutePath());
+
+        return image;
+    }
+
+    public static File createThumbnailBigFileName(Context context, String originalPath) {
+        File storeFile = StorageUtils.getCacheDirectory(context);
+        File bigThumbFile = new File(storeFile, "thumbnail_big_" + FilenameUtils.getName(originalPath));
+        return bigThumbFile;
+    }
+
+    public static File createThumbnailSmallFileName(Context context, String originalPath) {
+        File storeFile = StorageUtils.getCacheDirectory(context);
+        File smallThumbFile = new File(storeFile, "thumbnail_small_" + FilenameUtils.getName(originalPath));
+        return smallThumbFile;
+    }
+
+
 }

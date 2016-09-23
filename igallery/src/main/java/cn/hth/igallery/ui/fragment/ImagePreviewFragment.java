@@ -12,9 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +54,7 @@ public class ImagePreviewFragment extends Fragment implements View.OnClickListen
         ImageView imageView;
         for (ImageModel image : imageList) {
             imageView = new ImageView(getContext());
-            ImageLoaderUtils.getInstance(getContext()).displayImage(image.getData(),imageView);
+            ImageLoaderUtils.getInstance(getContext()).displayImage(image.getOriginalPath(),imageView);
             listView.add(imageView);
         }
 

@@ -18,19 +18,18 @@ import rx.schedulers.Schedulers;
  */
 public class MediaScannerHelper {
     public static void generateImages(Subscription subscription, Observer<List<ImageModel>> observer, final Context context, final int page, final int limit) {
-        subscription = Observable
-                .create(new Observable.OnSubscribe<List<ImageModel>>() {
-                    @Override
-                    public void call(Subscriber<? super List<ImageModel>> subscriber) {
-                        List<ImageModel> imageList = MediaUtil.getImages(context, page, limit);
-                        subscriber.onNext(imageList);
-                        subscriber.onCompleted();
-                    }
-                })
+        subscription = Observable.create(new Observable.OnSubscribe<List<ImageModel>>() {
+            @Override
+            public void call(Subscriber<? super List<ImageModel>> subscriber) {
+                List<ImageModel> imageList = MediaUtil.getImages(context, page, limit);
+                subscriber.onNext(imageList);
+                subscriber.onCompleted();
+            }
+        })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(observer);
     }
 
-    public static void getSmall
+//    public static void getSmall
 }

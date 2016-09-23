@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import cn.hth.igallery.Configuration;
 import cn.hth.igallery.R;
@@ -28,7 +29,7 @@ public class ImageScannerActivity extends FragmentActivity {
     private Activity mContext;
     private ImageGridFragment imageGridFragment;
     private ImagePreviewFragment imagePreviewFragment;
-    private ArrayList<ImageModel> mImageList;
+    private List<ImageModel> mImageList;
 
     public static final String EXTRA_CONFIGURATION = "extra_configuration";
     private Configuration mConfiguration;
@@ -46,7 +47,7 @@ public class ImageScannerActivity extends FragmentActivity {
         getIntentData();
         mScanner = new ImageScanner(this, new ImageScanner.ImageScannerCallBack() {
             @Override
-            public void onCompleted(ArrayList<ImageModel> imageList) {
+            public void onCompleted(List<ImageModel> imageList) {
                 mImageList = imageList;
                 selectImageGridFragment();
             }
@@ -141,7 +142,7 @@ public class ImageScannerActivity extends FragmentActivity {
         if (imagePreviewFragment == null) {
             imagePreviewFragment = new ImagePreviewFragment();
             Bundle bundle = new Bundle();
-            bundle.putSerializable(ImagePreviewFragment.IMAGE_EXTRA, mImageList);
+            bundle.putSerializable(ImagePreviewFragment.IMAGE_EXTRA, (ArrayList)mImageList);
             bundle.putInt(ImagePreviewFragment.IMAGE_CURRENT_INDEX_EXTRA,currentIndex);
             imagePreviewFragment.setArguments(bundle);
         }

@@ -106,12 +106,16 @@ public class ImageScannerActivity extends FragmentActivity {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         if (from == null) {
             mContent = to;
-            ft.add(R.id.frame_image_scanner, to,fragmentTags[position]).commit();
+            ft.add(R.id.frame_image_scanner, to,fragmentTags[position]);
+            ft.commit();
+            return;
         }
         if (mContent != to) {
             mContent = to;
             if (!to.isAdded()) {
-                ft.hide(from).add(R.id.frame_image_scanner, to,fragmentTags[position]).commit();
+                ft.hide(from);
+                ft.add(R.id.frame_image_scanner, to,fragmentTags[position]);
+                ft.commit();
             } else {
                 ft.hide(from).show(to).commit();
             }
@@ -123,6 +127,25 @@ public class ImageScannerActivity extends FragmentActivity {
             imageChoiceStatusFragment = new ImageChoiceStatusFragment();
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.add(R.id.frame_image_choice_status, imageChoiceStatusFragment).commit();
+
+            imageChoiceStatusFragment.setOnChoiceStatusListener(new ImageChoiceStatusFragment.OnChoiceStatusListener() {
+                @Override
+                public void onBack() {
+                    goBack();
+                }
+
+                @Override
+                public void onCompleted() {
+
+                }
+            });
+        }
+    }
+    private void goBack() {
+        List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
+        for (Fragment frag: fragmentList
+             ) {
+            LogUtil.i("----" + frag.getTag());
         }
     }
 

@@ -21,6 +21,7 @@ import cn.hth.igallery.ui.adapter.ImageGridAdapter;
  */
 public class ImageGridFragment extends Fragment {
     public static final String EXTRA_CONFIGURATION = "extra_configuration";
+    private ImageGridFragmentCallBack mListener;
 
     @Nullable
     @Override
@@ -53,7 +54,16 @@ public class ImageGridFragment extends Fragment {
         imageGridAdapter.setOnItemOnClickListener(new ImageGridAdapter.OnItemOnClickListener() {
             @Override
             public void onItemClick(View v, int position) {
-                ((ImageScannerActivity)getActivity()).selectImagePreviewFragment(position);
+//                if (mListener != null) {
+//
+//                }
+            }
+
+            @Override
+            public void onItenCheck() {
+                if (mListener != null) {
+                    mListener.onSelect();
+                }
             }
         });
     }
@@ -61,5 +71,13 @@ public class ImageGridFragment extends Fragment {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    public void setListener(ImageGridFragmentCallBack listener) {
+        this.mListener = listener;
+    }
+
+    public interface ImageGridFragmentCallBack{
+        void onSelect();
     }
 }

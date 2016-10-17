@@ -61,15 +61,10 @@ public class GalleryOperator {
             return;
         }
 
-        LogUtil.d("-->>" + "before put bundle");
         Intent intent = new Intent(context, ImageScannerActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable(ImageScannerActivity.EXTRA_CONFIGURATION,configuration);
-        LogUtil.d("-->>" + "after put putSerializable");
         intent.putExtras(bundle);
-        LogUtil.d("-->>" + "after put bundle");
-
-
         context.startActivity(intent);
     }
 

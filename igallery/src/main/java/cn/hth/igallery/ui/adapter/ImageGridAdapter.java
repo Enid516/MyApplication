@@ -34,6 +34,8 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.MyVi
 
     public interface OnItemOnClickListener {
         void onItemClick(View v, int position);
+
+        void onItenCheck();
     }
 
     public ImageGridAdapter(Context context, Configuration configuration) {
@@ -90,7 +92,7 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.MyVi
 
     @Override
     public int getItemCount() {
-        return mData.size();
+        return mData == null ? 0 : mData.size();
     }
 
     class CheckBoxClickListener implements View.OnClickListener {
@@ -106,6 +108,9 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.MyVi
                 mConfiguration.addSelectImage(mData.get(myViewHolder.getAdapterPosition()));
             } else {
                 mConfiguration.removeSelectImage(mData.get(myViewHolder.getAdapterPosition()));
+            }
+            if (mOnItemOnClickListener != null) {
+                mOnItemOnClickListener.onItenCheck();
             }
         }
     }

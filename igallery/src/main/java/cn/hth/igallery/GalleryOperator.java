@@ -60,7 +60,7 @@ public class GalleryOperator {
             Toast.makeText(context,"SD卡不存在",Toast.LENGTH_SHORT).show();
             return;
         }
-
+        Configuration.setConfiguration(configuration);
         Intent intent = new Intent(context, ImageScannerActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable(ImageScannerActivity.EXTRA_CONFIGURATION,configuration);

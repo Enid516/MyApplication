@@ -14,6 +14,7 @@ import java.util.List;
 import cn.hth.igallery.Configuration;
 import cn.hth.igallery.R;
 import cn.hth.igallery.model.ImageModel;
+import cn.hth.igallery.ui.fragment.GridBottomBannerFragment;
 import cn.hth.igallery.ui.fragment.ImageChoiceStatusFragment;
 import cn.hth.igallery.ui.fragment.ImageGridFragment;
 import cn.hth.igallery.util.ImageScanner;
@@ -28,6 +29,7 @@ public class ImageScannerActivity extends FragmentActivity {
     private Activity mContext;
     private ImageChoiceStatusFragment imageChoiceStatusFragment;
     private ImageGridFragment imageGridFragment;
+    private GridBottomBannerFragment gridBottomBannerFragment;
     public static final String EXTRA_CONFIGURATION = "extra_configuration";
     private Configuration mConfiguration;
 
@@ -131,9 +133,23 @@ public class ImageScannerActivity extends FragmentActivity {
                 @Override
                 public void onSelect() {
                     imageChoiceStatusFragment.setSelectSize();
+                    gridBottomBannerFragment.check();
                 }
             });
             ft.add(R.id.frame_image_scanner,imageGridFragment).commit();
+        }
+
+        //add grid bottom fragment
+        if (gridBottomBannerFragment == null) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            gridBottomBannerFragment = new GridBottomBannerFragment();
+//            gridBottomBannerFragment.setListener(new ImageGridFragment.ImageGridFragmentCallBack() {
+//                @Override
+//                public void onSelect() {
+//                    imageChoiceStatusFragment.setSelectSize();
+//                }
+//            });
+            ft.add(R.id.frame_grid_bottom_banner,gridBottomBannerFragment).commit();
         }
     }
 

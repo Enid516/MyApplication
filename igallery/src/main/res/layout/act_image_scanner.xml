@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+
     <FrameLayout
         android:id="@+id/frame_image_choice_status"
         android:layout_width="match_parent"
@@ -11,8 +12,14 @@
     </FrameLayout>
 
     <FrameLayout
+        android:layout_below="@id/frame_image_choice_status"
         android:id="@+id/frame_image_scanner"
         android:layout_width="match_parent"
         android:layout_height="match_parent"></FrameLayout>
+    <FrameLayout
+        android:layout_alignParentBottom="true"
+        android:id="@+id/frame_grid_bottom_banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></FrameLayout>
 
-</LinearLayout>
+</RelativeLayout>

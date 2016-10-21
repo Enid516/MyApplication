@@ -14,6 +14,7 @@ import cn.hth.igallery.util.LogUtil;
  */
 public class Configuration implements Serializable{
     private static final long serialVersionUID = -1;
+    private static Configuration mConfiguration;
     private Context context;
     private int maxChoiceSize = 1;
     /** the selected image list*/
@@ -80,4 +81,12 @@ public class Configuration implements Serializable{
         if (selectedList.contains(imageModel))
             selectedList.remove(imageModel);
     }
+
+    public static void setConfiguration(Configuration configuration) {
+        mConfiguration = configuration;
+    }
+    public static Configuration getConfiguration() {
+        return mConfiguration;
+    }
+
 }

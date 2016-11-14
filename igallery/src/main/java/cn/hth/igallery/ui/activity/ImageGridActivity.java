@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.v4.app.*;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 
@@ -14,9 +13,9 @@ import java.util.List;
 import cn.hth.igallery.Configuration;
 import cn.hth.igallery.R;
 import cn.hth.igallery.model.ImageModel;
-import cn.hth.igallery.ui.fragment.GridBottomBannerFragment;
-import cn.hth.igallery.ui.fragment.ImageChoiceStatusFragment;
+import cn.hth.igallery.ui.fragment.ImageGridBottomFragment;
 import cn.hth.igallery.ui.fragment.ImageGridFragment;
+import cn.hth.igallery.ui.fragment.ImageGridTopFragment;
 import cn.hth.igallery.util.ImageScanner;
 import cn.hth.igallery.util.LogUtil;
 
@@ -24,31 +23,29 @@ import cn.hth.igallery.util.LogUtil;
  * Created by Enid on 2016/9/7.
  * scanner image for select
  */
-public class ImageScannerActivity extends FragmentActivity {
+public class ImageGridActivity extends BaseActivity {
     private ImageScanner mScanner;
     private Activity mContext;
-    private ImageChoiceStatusFragment imageChoiceStatusFragment;
+    private ImageGridTopFragment imageGridTopFragment;
     private ImageGridFragment imageGridFragment;
-    private GridBottomBannerFragment gridBottomBannerFragment;
+    private ImageGridBottomFragment iamgeridBottomFragment;
     public static final String EXTRA_CONFIGURATION = "extra_configuration";
-    private Configuration mConfiguration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.act_image_scanner);
+        setContentView(R.layout.act_image_grid);
         mContext = this;
         init();
     }
 
     private void init() {
         getIntentData();
-
         mScanner = new ImageScanner(this, new ImageScanner.ImageScannerCallBack() {
             @Override
             public void onCompleted(List<ImageModel> imageList) {
                 if (imageList != null) {
-                    mConfiguration.setImageList(imageList);
+                    Configuration.getConfiguration().setImageList(imageList);
                     addFragment();
                 }
             }
@@ -57,7 +54,8 @@ public class ImageScannerActivity extends FragmentActivity {
 
     private void getIntentData() {
         Bundle bundle = getIntent().getExtras();
-        mConfiguration = (Configuration) bundle.getSerializable(EXTRA_CONFIGURATION);
+        Configuration configuration = (Configuration) bundle.getSerializable(EXTRA_CONFIGURATION);
+        Configuration.setConfiguration(configuration);
     }
 
     @Override
@@ -99,13 +97,10 @@ public class ImageScannerActivity extends FragmentActivity {
     public void addFragment() {
 
         //add statusFragment
-        if (imageChoiceStatusFragment == null) {
+        if (imageGridTopFragment == null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            imageChoiceStatusFragment = new ImageChoiceStatusFragment();
-            Bundle bundle = new Bundle();
-            bundle.putSerializable(ImageGridFragment.EXTRA_CONFIGURATION,mConfiguration);
-            imageChoiceStatusFragment.setArguments(bundle);
-            imageChoiceStatusFragment.setListener(new ImageChoiceStatusFragment.ChoiceStatusFragmentCallBack() {
+            imageGridTopFragment = new ImageGridTopFragment();
+            imageGridTopFragment.setListener(new ImageGridTopFragment.ChoiceStatusFragmentCallBack() {
                 @Override
                 public void onBack() {
                     finish();
@@ -113,49 +108,51 @@ public class ImageScannerActivity extends FragmentActivity {
 
                 @Override
                 public void onCompleted() {
-                    List<ImageModel>  list = mConfiguration.getSelectedList();
+                    List<ImageModel> list = Configuration.getConfiguration().getSelectedList();
                     LogUtil.i(" 选择的图片数量: " + list.size());
-                    for (int i =0 ; i<list.size();i++) {
-                        LogUtil.i("第" + (i+1) + "张：" + list.get(i).getThumbnailSmallPath());
+                    for (int i = 0; i < list.size(); i++) {
+                        LogUtil.i("第" + (i + 1) + "张：" + list.get(i).getThumbnailSmallPath());
                     }
                 }
             });
-            ft.add(R.id.frame_image_choice_status, imageChoiceStatusFragment).commit();
+            ft.add(R.id.frame_image_grid_top, imageGridTopFragment).commit();
         }
         //add image grid fragment
         if (imageGridFragment == null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             imageGridFragment = new ImageGridFragment();
-            Bundle bundle = new Bundle();
-            bundle.putSerializable(ImageGridFragment.EXTRA_CONFIGURATION,mConfiguration);
-            imageGridFragment.setArguments(bundle);
             imageGridFragment.setListener(new ImageGridFragment.ImageGridFragmentCallBack() {
                 @Override
                 public void onSelect() {
-                    imageChoiceStatusFragment.setSelectSize();
-                    gridBottomBannerFragment.check();
+                    imageGridTopFragment.setSelectSize();
+                    iamgeridBottomFragment.check();
+                }
+
+                @Override
+                public void onItemClick(int position) {
+                    ImagePreviewActivity.actionStart(ImageGridActivity.this,position);
                 }
             });
-            ft.add(R.id.frame_image_scanner,imageGridFragment).commit();
+            ft.add(R.id.frame_image_scanner, imageGridFragment).commit();
         }
 
         //add grid bottom fragment
-        if (gridBottomBannerFragment == null) {
+        if (iamgeridBottomFragment == null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            gridBottomBannerFragment = new GridBottomBannerFragment();
+            iamgeridBottomFragment = new ImageGridBottomFragment();
 //            gridBottomBannerFragment.setListener(new ImageGridFragment.ImageGridFragmentCallBack() {
 //                @Override
 //                public void onSelect() {
 //                    imageChoiceStatusFragment.setSelectSize();
 //                }
 //            });
-            ft.add(R.id.frame_grid_bottom_banner,gridBottomBannerFragment).commit();
+            ft.add(R.id.frame_grid_bottom, iamgeridBottomFragment).commit();
         }
     }
 
     public int getScreenWidth() {
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        return  metrics.widthPixels;
+        return metrics.widthPixels;
     }
 }

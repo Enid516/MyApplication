@@ -13,14 +13,12 @@ import android.view.ViewGroup;
 
 import cn.hth.igallery.Configuration;
 import cn.hth.igallery.R;
-import cn.hth.igallery.ui.activity.ImageScannerActivity;
 import cn.hth.igallery.ui.adapter.ImageGridAdapter;
 
 /**
  * Created by Enid on 2016/9/7.
  */
 public class ImageGridFragment extends Fragment {
-    public static final String EXTRA_CONFIGURATION = "extra_configuration";
     private ImageGridFragmentCallBack mListener;
 
     @Nullable
@@ -45,18 +43,16 @@ public class ImageGridFragment extends Fragment {
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_frag_image_scanner);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
 
-        //get data
-        Configuration configuration = (Configuration) getArguments().getSerializable(EXTRA_CONFIGURATION);
-        ImageGridAdapter imageGridAdapter = new ImageGridAdapter(getContext(),configuration);
+        ImageGridAdapter imageGridAdapter = new ImageGridAdapter(getContext(),Configuration.getConfiguration());
         recyclerView.setAdapter(imageGridAdapter);
 
         //register on item onclick listener
         imageGridAdapter.setOnItemOnClickListener(new ImageGridAdapter.OnItemOnClickListener() {
             @Override
             public void onItemClick(View v, int position) {
-//                if (mListener != null) {
-//
-//                }
+                if (mListener != null) {
+                    mListener.onItemClick(position);
+                }
             }
 
             @Override
@@ -79,5 +75,6 @@ public class ImageGridFragment extends Fragment {
 
     public interface ImageGridFragmentCallBack{
         void onSelect();
+        void onItemClick(int position);
     }
 }

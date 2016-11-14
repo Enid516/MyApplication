@@ -1,6 +1,7 @@
 package cn.hth.igallery;
 
 import android.content.Context;
+import android.widget.Toast;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ public class Configuration implements Serializable{
     private static final long serialVersionUID = -1;
     private static Configuration mConfiguration;
     private Context context;
+    /** the max size of select images*/
     private int maxChoiceSize = 1;
     /** the selected image list*/
     private List<ImageModel> selectedList;
@@ -72,6 +74,9 @@ public class Configuration implements Serializable{
     public void addSelectImage(ImageModel imageModel) {
         if (selectedList == null)
             return;
+        if (selectedList.size() >= maxChoiceSize){
+            Toast.makeText(getContext(),"最多选择" + maxChoiceSize +"张图片",Toast.LENGTH_SHORT).show();
+        }
         if (!selectedList.contains(imageModel))
             selectedList.add(imageModel);
     }

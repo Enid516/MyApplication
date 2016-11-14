@@ -11,13 +11,13 @@ import android.widget.Button;
 
 import cn.hth.igallery.Configuration;
 import cn.hth.igallery.R;
-import cn.hth.igallery.ui.activity.PreViewActivity;
+import cn.hth.igallery.ui.activity.ImagePreviewActivity;
 
 /**
  * Created by Enid on 2016/10/18.
  */
 
-public class GridBottomBannerFragment extends Fragment{
+public class ImageGridBottomFragment extends Fragment{
     private Button btnPreview;
     @Nullable
     @Override
@@ -42,7 +42,7 @@ public class GridBottomBannerFragment extends Fragment{
         btnPreview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getContext(), PreViewActivity.class);
+                Intent intent = new Intent(getContext(), ImagePreviewActivity.class);
                 getContext().startActivity(intent);
             }
         });

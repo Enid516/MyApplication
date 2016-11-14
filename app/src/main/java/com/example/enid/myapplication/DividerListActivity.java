@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Created by Enid on 2016/8/29.
  */
-public class DividerListActivity extends Activity{
+public class DividerListActivity extends BaseActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

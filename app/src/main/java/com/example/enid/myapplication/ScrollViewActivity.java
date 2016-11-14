@@ -12,7 +12,7 @@ import android.widget.TextView;
  * Created by Enid on 2016/8/29.
  * found in http://blog.csdn.net/megatronkings/article/details/52156312
  */
-public class ScrollViewActivity extends Activity implements View.OnClickListener{
+public class ScrollViewActivity extends BaseActivity implements View.OnClickListener{
     private TextView tv;
     private int i = 1;
     private CustomView customView;

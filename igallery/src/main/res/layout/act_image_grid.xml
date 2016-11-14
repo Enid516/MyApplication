@@ -5,20 +5,20 @@
     android:orientation="vertical">
 
     <FrameLayout
-        android:id="@+id/frame_image_choice_status"
+        android:id="@+id/frame_image_grid_top"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:background="@null">
     </FrameLayout>
 
     <FrameLayout
-        android:layout_below="@id/frame_image_choice_status"
+        android:layout_below="@id/frame_image_grid_top"
         android:id="@+id/frame_image_scanner"
         android:layout_width="match_parent"
         android:layout_height="match_parent"></FrameLayout>
     <FrameLayout
         android:layout_alignParentBottom="true"
-        android:id="@+id/frame_grid_bottom_banner"
+        android:id="@+id/frame_grid_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"></FrameLayout>
 

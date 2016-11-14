@@ -8,11 +8,9 @@ import android.support.annotation.NonNull;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import cn.hth.igallery.model.ImageModel;
-import cn.hth.igallery.ui.activity.ImageScannerActivity;
-import cn.hth.igallery.util.LogUtil;
+import cn.hth.igallery.ui.activity.ImageGridActivity;
 import cn.hth.igallery.util.Utils;
 
 /**
@@ -53,17 +51,16 @@ public class GalleryOperator {
     }
 
     private void execute(Context context) {
-//        Context context = configuration.getContext();
         if (context == null)
             return;
         if (!Utils.checkSD()) {
-            Toast.makeText(context,"SD卡不存在",Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "SD卡不存在", Toast.LENGTH_SHORT).show();
             return;
         }
         Configuration.setConfiguration(configuration);
-        Intent intent = new Intent(context, ImageScannerActivity.class);
+        Intent intent = new Intent(context, ImageGridActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putSerializable(ImageScannerActivity.EXTRA_CONFIGURATION,configuration);
+        bundle.putSerializable(ImageGridActivity.EXTRA_CONFIGURATION, configuration);
         intent.putExtras(bundle);
         context.startActivity(intent);
     }

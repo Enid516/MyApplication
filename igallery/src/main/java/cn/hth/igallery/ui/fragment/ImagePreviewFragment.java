@@ -15,9 +15,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.hth.igallery.Configuration;
 import cn.hth.igallery.R;
 import cn.hth.igallery.model.ImageModel;
-import cn.hth.igallery.ui.activity.ImageScannerActivity;
+import cn.hth.igallery.ui.activity.ImageGridActivity;
 import cn.hth.igallery.util.ImageLoaderUtils;
 import cn.hth.igallery.util.LogUtil;
 
@@ -26,7 +27,6 @@ import cn.hth.igallery.util.LogUtil;
  * Created by Enid on 2016/9/12.
  */
 public class ImagePreviewFragment extends Fragment{
-    public static final String IMAGE_EXTRA = "imageList";
     public static final String IMAGE_CURRENT_INDEX_EXTRA = "imageCurrentIndex";
     @Nullable
     @Override
@@ -45,7 +45,7 @@ public class ImagePreviewFragment extends Fragment{
         ViewPager viewPager = (ViewPager) view.findViewById(R.id.viewpager_frag_image_preview);
 
         //list view
-        final ArrayList<ImageModel> imageList = (ArrayList<ImageModel>) getArguments().getSerializable(IMAGE_EXTRA);
+        final List<ImageModel> imageList = Configuration.getConfiguration().getImageList();
         int imageIndex = getArguments().getInt(IMAGE_CURRENT_INDEX_EXTRA,0);
         final List<ImageView> listView = new ArrayList<>();
         ImageView imageView;

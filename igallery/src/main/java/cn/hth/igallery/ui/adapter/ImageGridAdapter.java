@@ -18,9 +18,7 @@ import cn.hth.igallery.job.ImageThumbnailJob;
 import cn.hth.igallery.job.Job;
 import cn.hth.igallery.job.RxJob;
 import cn.hth.igallery.model.ImageModel;
-import cn.hth.igallery.ui.activity.ImageScannerActivity;
 import cn.hth.igallery.util.ImageLoaderUtils;
-import cn.hth.igallery.util.LogUtil;
 
 
 /**

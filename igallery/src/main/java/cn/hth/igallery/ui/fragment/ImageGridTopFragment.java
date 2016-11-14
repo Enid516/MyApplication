@@ -11,14 +11,13 @@ import android.widget.ImageButton;
 
 import cn.hth.igallery.Configuration;
 import cn.hth.igallery.R;
+import cn.hth.igallery.ui.activity.ImageGridActivity;
 
 /**
  * Created by Enid on 2016/9/23.
  */
-public class ImageChoiceStatusFragment extends Fragment {
-    public static final String EXTRA_CONFIGURATION = "extra_configuration";
+public class ImageGridTopFragment extends Fragment {
     private Button btnComplete;
-    Configuration mConfiguration;
     private ChoiceStatusFragmentCallBack mListener;
 
     @Nullable
@@ -51,9 +50,6 @@ public class ImageChoiceStatusFragment extends Fragment {
                 }
             }
         });
-
-        Bundle bundle = getArguments();
-        mConfiguration = (Configuration) bundle.getSerializable(EXTRA_CONFIGURATION);
     }
 
     public void setListener(ChoiceStatusFragmentCallBack listener) {
@@ -62,7 +58,7 @@ public class ImageChoiceStatusFragment extends Fragment {
 
 
     public void setSelectSize() {
-        btnComplete.setText("完成(" + mConfiguration.getSelectedList().size() + " / " + mConfiguration.getMaxChoiceSize() + ")");
+        btnComplete.setText("完成(" + Configuration.getConfiguration().getSelectedList().size() + " / " + Configuration.getConfiguration().getMaxChoiceSize() + ")");
     }
 
     public interface ChoiceStatusFragmentCallBack {

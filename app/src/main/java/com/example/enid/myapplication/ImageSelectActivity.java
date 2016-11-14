@@ -14,7 +14,7 @@ import cn.hth.igallery.model.ImageModel;
 /**
  * Created by Enid on 2016/9/21.
  */
-public class ImageSelectActivity extends Activity{
+public class ImageSelectActivity extends BaseActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

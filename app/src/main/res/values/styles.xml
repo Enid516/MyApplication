@@ -8,4 +8,15 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!--Main activity theme.-->
+    <style name="StartTheme" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/start_window</item>
+    </style>
+
+    <!--底部对话框动画-->
+    <style name="AnimationDialog" parent="@android:style/Animation">
+        <item name="android:windowEnterAnimation">@anim/dialog_enter_sliding_from_bottom</item>
+        <item name="android:windowExitAnimation">@anim/dialog_exit_sliding_to_bottom</item>
+    </style>
+
 </resources>

@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -103,7 +104,10 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.MyVi
         @Override
         public void onClick(View v) {
             if (myViewHolder.checkBox.isChecked()) {
-                mConfiguration.addSelectImage(mData.get(myViewHolder.getAdapterPosition()));
+                String addMsg = mConfiguration.addSelectImage(mData.get(myViewHolder.getAdapterPosition()));
+                if (TextUtils.isEmpty(addMsg)) {
+                    Toast.makeText(mContext,addMsg,Toast.LENGTH_SHORT).show();
+                }
             } else {
                 mConfiguration.removeSelectImage(mData.get(myViewHolder.getAdapterPosition()));
             }

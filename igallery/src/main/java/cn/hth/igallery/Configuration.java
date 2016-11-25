@@ -16,7 +16,7 @@ import cn.hth.igallery.util.LogUtil;
 public class Configuration implements Serializable{
     private static final long serialVersionUID = -1;
     private static Configuration mConfiguration;
-    private Context context;
+//    private Context context;
     /** the max size of select images*/
     private int maxChoiceSize = 1;
     /** the selected image list*/
@@ -31,13 +31,13 @@ public class Configuration implements Serializable{
     /** the default image choice model is single*/
     private ImageChoiceModel choiceModel = ImageChoiceModel.SINGLE;
 
-    public Context getContext() {
-        return this.context;
-    }
-
-    public void setContext(Context context) {
-        this.context = context;
-    }
+//    public Context getContext() {
+//        return this.context;
+//    }
+//
+//    public void setContext(Context context) {
+//        this.context = context;
+//    }
 
     public int getMaxChoiceSize() {
         return maxChoiceSize;
@@ -71,14 +71,15 @@ public class Configuration implements Serializable{
         this.imageList = imageList;
     }
 
-    public void addSelectImage(ImageModel imageModel) {
+    public String addSelectImage(ImageModel imageModel) {
         if (selectedList == null)
-            return;
+            return "null";
         if (selectedList.size() >= maxChoiceSize){
-            Toast.makeText(getContext(),"最多选择" + maxChoiceSize +"张图片",Toast.LENGTH_SHORT).show();
+            return "最多选择" + maxChoiceSize +"张图片";
         }
         if (!selectedList.contains(imageModel))
             selectedList.add(imageModel);
+        return null;
     }
     public void removeSelectImage(ImageModel imageModel) {
         if (selectedList == null)

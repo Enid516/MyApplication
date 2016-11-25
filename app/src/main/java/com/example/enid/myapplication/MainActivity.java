@@ -2,12 +2,14 @@ package com.example.enid.myapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
+import com.example.enid.myapplication.dialog.CustomCommDialog;
 import com.example.enid.myapplication.fragmenttabhost.FragmentTabHostActivity;
 import com.example.enid.myapplication.view.ListViewAnalyse;
 
@@ -23,9 +25,9 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SystemClock.sleep(2000);
         setContentView(R.layout.activity_main);
         listView = (ListView) findViewById(R.id.list);
-
         String[] from = new String[]{"key"};
         int[] to = new int[]{android.R.id.text1};
         listView.setAdapter(new SimpleAdapter(this, getData(), android.R.layout.activity_list_item, from, to));
@@ -45,7 +47,24 @@ public class MainActivity extends BaseActivity {
                         intent = new Intent(MainActivity.this, ListViewAnalyse.class);
                         break;
                     case 3:
-                        intent = new Intent(MainActivity.this, ImageSelectActivity.class);
+                        new CustomCommDialog.Builder(MainActivity.this)
+                                .setSelectItem("从相册获取图片","拍照")
+                                .setCancelButtonTitle("取消")
+                                .setListener(new CustomCommDialog.DialogActionListener() {
+                                    @Override
+                                    public void onDismiss(CustomCommDialog action, boolean isCancel) {
+
+                                    }
+
+                                    @Override
+                                    public void onSelectItemClick(CustomCommDialog action, int index) {
+                                        if (index == 0) {
+                                            Intent intent = new Intent(MainActivity.this, ImageSelectActivity.class);
+                                            startActivity(intent);
+                                        }
+                                    }
+                                })
+                                .show();
                         break;
                     case 4:
                         intent = new Intent(MainActivity.this, FragmentTabHostActivity.class);

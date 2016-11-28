@@ -159,17 +159,17 @@ public class MyView extends View {
     private void startAnimation() {
         Point startPoint = new Point(RADIUS, RADIUS);
         Point endPoint = new Point(getWidth() - RADIUS, getHeight() - RADIUS);
-        ValueAnimator animator = ValueAnimator.ofObject(new PointEvaluator(), startPoint, endPoint);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        ValueAnimator animator1 = ValueAnimator.ofObject(new PointEvaluator(), startPoint, endPoint);
+        animator1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 mCurrentPoint = (Point) animation.getAnimatedValue();
                 invalidate();
             }
         });
-        ObjectAnimator objectAnimator = ObjectAnimator.ofObject(this, "color", new ColorEvaluator(), "#0000FF", "#FF0000");
+        ObjectAnimator animator2 = ObjectAnimator.ofObject(this, "color", new ColorEvaluator(), "#0000FF", "#FF0000");
         AnimatorSet animatorSet = new AnimatorSet();
-        animatorSet.play(animator).with(objectAnimator);
+        animatorSet.play(animator1).with(animator2);
         animatorSet.setDuration(5000);
         animatorSet.setInterpolator(new BounceInterpolator());
         animatorSet.start();

@@ -3,12 +3,12 @@ package com.example.enid.myapplication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
+import com.example.enid.myapplication.dataS.BlockingQueueTest;
 import com.example.enid.myapplication.dialog.CustomCommDialog;
 import com.example.enid.myapplication.fragmenttabhost.FragmentTabHostActivity;
 import com.example.enid.myapplication.view.ListViewAnalyse;
@@ -27,6 +27,22 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         SystemClock.sleep(2000);
         setContentView(R.layout.activity_main);
+        init();
+    }
+
+    private void init() {
+        initList();
+//        initTest();
+    }
+
+    private void initTest() {
+        BlockingQueueTest test = new BlockingQueueTest();
+        for (int i = 0; i < 101; i++) {
+            test.offerExit("hello");
+        }
+    }
+
+    private void initList() {
         listView = (ListView) findViewById(R.id.list);
         String[] from = new String[]{"key"};
         int[] to = new int[]{android.R.id.text1};
@@ -41,14 +57,14 @@ public class MainActivity extends BaseActivity {
                         intent = new Intent(MainActivity.this, ScrollViewActivity.class);
                         break;
                     case 1:
-                        intent = new Intent(MainActivity.this,DividerListActivity.class);
+                        intent = new Intent(MainActivity.this, DividerListActivity.class);
                         break;
                     case 2:
                         intent = new Intent(MainActivity.this, ListViewAnalyse.class);
                         break;
                     case 3:
                         new CustomCommDialog.Builder(MainActivity.this)
-                                .setSelectItem("从相册获取图片","拍照")
+                                .setSelectItem("从相册获取图片", "拍照")
                                 .setCancelButtonTitle("取消")
                                 .setListener(new CustomCommDialog.DialogActionListener() {
                                     @Override
@@ -70,7 +86,7 @@ public class MainActivity extends BaseActivity {
                         intent = new Intent(MainActivity.this, FragmentTabHostActivity.class);
                         break;
                     default:
-                    break;
+                        break;
                 }
 
                 if (intent != null) {
@@ -80,8 +96,7 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-
-    private List<Map<String,String>> getData() {
+    private List<Map<String, String>> getData() {
         List<Map<String, String>> data = new ArrayList<>();
         Map<String, String> map1 = new HashMap<>();
         map1.put("key", "Scroll View");
@@ -104,9 +119,6 @@ public class MainActivity extends BaseActivity {
         data.add(map5);
         return data;
     }
-
-
-
 }
 
 

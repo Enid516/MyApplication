@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <Button
+        android:onClick="topA"
+        android:id="@+id/btn_add_fragment_top_a"
+        android:layout_width="match_parent"
+        android:text="TOP 显示 FragmentA"
+        android:layout_height="wrap_content" />
+    <Button
+        android:onClick="topB"
+        android:id="@+id/btn_add_fragment_top_b"
+        android:layout_width="match_parent"
+        android:text="TOP 显示 FragmentB"
+        android:layout_height="wrap_content" />
+    <Button
+        android:onClick="bottomA"
+        android:id="@+id/btn_add_fragment_bottom_a"
+        android:layout_width="match_parent"
+        android:text="BOTTOM 显示 FragmentA"
+        android:layout_height="wrap_content" />
+    <Button
+        android:onClick="bottomB"
+        android:id="@+id/btn_add_fragment_bottom_b"
+        android:layout_width="match_parent"
+        android:text="BOTTOM 显示 FragmentB"
+        android:layout_height="wrap_content" />
+
+    <FrameLayout
+        android:id="@+id/container_top"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"></FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/container_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"></FrameLayout>
+
+
+</LinearLayout>

@@ -20,9 +20,6 @@ public class RemoteControlMenu extends View {
     private Path centerPath, leftPath, topPath, rightPath, bottomPath;
     private Region centerRegion, leftRegion, topRegion, rightRegion, bottomRegion;
     private Paint mPaint;
-
-    private float downX;
-    private float downY;
     private int mWidth, mHeight;
     private int currentFlag = -1;
     private static final int CENTER_FLAG = 0;
@@ -85,11 +82,14 @@ public class RemoteControlMenu extends View {
         float[] pts = {event.getX(), event.getY()};
         //将触摸位置转换为画布坐标
         mMapMatrix.mapPoints(pts);
-        downX = pts[0];
-        downY = pts[1];
+        int x = (int) pts[0];
+        int y = (int) pts[1];
+        //测试mMapMatrix.mapPoints(pts);的位置
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                currentFlag = getDownTouchFlag((int) downX, (int) downY);
+                currentFlag = getDownTouchFlag((int) x, (int) y);
+
+
                 break;
             case MotionEvent.ACTION_UP:
                 currentFlag = -1;
@@ -105,7 +105,7 @@ public class RemoteControlMenu extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        mMapMatrix.reset();
+//        mMapMatrix.reset();
         mWidth = w;
         mHeight = h;
         //设置触摸区域的大小
@@ -149,7 +149,6 @@ public class RemoteControlMenu extends View {
         super.onDraw(canvas);
         canvas.translate(mWidth / 2, mHeight / 2);
 
-
         if (mMapMatrix.isIdentity()) {
             canvas.getMatrix().invert(mMapMatrix);
         }
@@ -175,7 +174,6 @@ public class RemoteControlMenu extends View {
             canvas.drawPath(bottomPath, mPaint);
         }
         mPaint.setColor(Color.CYAN);
-
     }
 
     private interface MenuListenerInterface {

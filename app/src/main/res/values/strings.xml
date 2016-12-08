@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">My Application</string>
+    <string name="get_from_photo">从相册获取图片</string>
+    <string name="take_photo">拍照</string>
 </resources>

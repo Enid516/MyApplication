@@ -16,9 +16,10 @@
         android:id="@+id/item_tv_cancel"
         android:gravity="center"
         android:textColor="#666666"
-        android:textSize="24sp"
+        android:background="@drawable/selector_item_bottom_tint_line"
+        android:textSize="14sp"
         android:layout_width="match_parent"
-        android:text="取消"
+        android:text="@string/cancel"
         android:layout_height="50dp" />
 
 </LinearLayout>

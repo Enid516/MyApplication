@@ -8,9 +8,11 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
+import com.enid.library.dialog.CustomMultiSelectDialog;
 import com.example.enid.myapplication.dataS.BlockingQueueTest;
-import com.example.enid.myapplication.dialog.CustomCommDialog;
+import com.example.enid.myapplication.drawable.ShapeDrawableClass;
 import com.example.enid.myapplication.fragmenttabhost.FragmentTabHostActivity;
+import com.example.enid.myapplication.fragmenttest.FragmentTestActivity;
 import com.example.enid.myapplication.view.ListViewAnalyse;
 
 import java.util.ArrayList;
@@ -32,7 +34,12 @@ public class MainActivity extends BaseActivity {
 
     private void init() {
         initList();
-//        initTest();
+        testDrawable();
+    }
+
+    private void testDrawable(){
+        View viewById = findViewById(R.id.drawable_view);
+        viewById.setBackgroundDrawable(ShapeDrawableClass.getShapeDrawable());
     }
 
     private void initTest() {
@@ -63,17 +70,12 @@ public class MainActivity extends BaseActivity {
                         intent = new Intent(MainActivity.this, ListViewAnalyse.class);
                         break;
                     case 3:
-                        new CustomCommDialog.Builder(MainActivity.this)
-                                .setSelectItem("从相册获取图片", "拍照")
-                                .setCancelButtonTitle("取消")
-                                .setListener(new CustomCommDialog.DialogActionListener() {
+                        new CustomMultiSelectDialog.Builder(MainActivity.this)
+                                .setSelectItem(getResources().getString(R.string.get_from_photo), getResources().getString(R.string.take_photo))
+                                .setCancelButtonTitle(getResources().getString(R.string.cancel))
+                                .setListener(new CustomMultiSelectDialog.DialogActionListener() {
                                     @Override
-                                    public void onDismiss(CustomCommDialog action, boolean isCancel) {
-
-                                    }
-
-                                    @Override
-                                    public void onSelectItemClick(CustomCommDialog action, int index) {
+                                    public void onSelectItemClick(CustomMultiSelectDialog action, int index) {
                                         if (index == 0) {
                                             Intent intent = new Intent(MainActivity.this, ImageSelectActivity.class);
                                             startActivity(intent);
@@ -84,6 +86,9 @@ public class MainActivity extends BaseActivity {
                         break;
                     case 4:
                         intent = new Intent(MainActivity.this, FragmentTabHostActivity.class);
+                        break;
+                    case 5:
+                        intent = new Intent(MainActivity.this, FragmentTestActivity.class);
                         break;
                     default:
                         break;
@@ -117,6 +122,10 @@ public class MainActivity extends BaseActivity {
         Map<String, String> map5 = new HashMap<>();
         map5.put("key", "FragmentTabHost");
         data.add(map5);
+
+        Map<String, String> map6 = new HashMap<>();
+        map6.put("key", "FragmentTest");
+        data.add(map6);
         return data;
     }
 }

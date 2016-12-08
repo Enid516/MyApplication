@@ -1,1 +1,1 @@
-include ':app', ':igallery'
+include ':app', ':igallery', ':library_custom'

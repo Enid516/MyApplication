@@ -1,8 +1,5 @@
-package com.example.enid.myapplication.util;
+package com.enid.library.utils;
 
-import android.annotation.SuppressLint;
-import android.os.Build;
-import android.os.Build.VERSION_CODES;
 import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -13,29 +10,12 @@ import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
-
-import com.example.enid.myapplication.app.MyApplication;
+import com.enid.library.HLibrary;
 
 import java.util.List;
 
 
-public class ViewUtil {
-
-    @SuppressLint("NewApi")
-    public static void scrollToViewY(final ScrollView sv, final int y, int delay) {
-        if (sv != null && delay >= 0) {
-            if (Build.VERSION.SDK_INT >= VERSION_CODES.HONEYCOMB) {
-                HandlerUtil.runOnUiThreadDelayed(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        sv.scrollTo(0, y);
-                    }
-                }, delay);
-            }
-        }
-    }
+public class HViewUtil {
 
     // -------------------------layoutParams
     public static LayoutParams getLayoutParamsLinearLayoutWW() {
@@ -88,7 +68,7 @@ public class ViewUtil {
 
     // ------------------------layoutInflater
     public static LayoutInflater getLayoutInflater() {
-        return LayoutInflater.from(MyApplication.getInstance());
+        return LayoutInflater.from(HLibrary.getInstance().getApplication());
     }
 
     public static View inflate(int resource, ViewGroup root) {
@@ -100,7 +80,7 @@ public class ViewUtil {
     }
 
     public static DisplayMetrics getDisplayMetrics() {
-        return MyApplication.getInstance().getResources().getDisplayMetrics();
+        return HLibrary.getInstance().getApplication().getResources().getDisplayMetrics();
     }
 
     public static int getScreenWidth() {
@@ -114,11 +94,11 @@ public class ViewUtil {
     }
 
     public static float getDensity() {
-        return MyApplication.getInstance().getResources().getDisplayMetrics().density;
+        return HLibrary.getInstance().getApplication().getResources().getDisplayMetrics().density;
     }
 
     public static float getScaledDensity() {
-        return MyApplication.getInstance().getResources().getDisplayMetrics().scaledDensity;
+        return HLibrary.getInstance().getApplication().getResources().getDisplayMetrics().scaledDensity;
     }
 
     public static int sp2px(float sp) {

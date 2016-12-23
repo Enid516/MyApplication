@@ -11,9 +11,9 @@ import cn.hth.igallery.Configuration;
  */
 
 public class BaseActivity extends FragmentActivity{
+    public Configuration mConfiguration;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        Configuration.getConfiguration().setContext(this);
     }
 }

@@ -1,6 +1,6 @@
 package cn.hth.igallery;
 
-import android.content.Context;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import java.io.Serializable;
@@ -12,11 +12,10 @@ import cn.hth.igallery.util.LogUtil;
 
 /**
  * Created by Enid on 2016/9/21.
+ * image select configuration
  */
 public class Configuration implements Serializable{
     private static final long serialVersionUID = -1;
-    private static Configuration mConfiguration;
-//    private Context context;
     /** the max size of select images*/
     private int maxChoiceSize = 1;
     /** the selected image list*/
@@ -30,14 +29,6 @@ public class Configuration implements Serializable{
     }
     /** the default image choice model is single*/
     private ImageChoiceModel choiceModel = ImageChoiceModel.SINGLE;
-
-//    public Context getContext() {
-//        return this.context;
-//    }
-//
-//    public void setContext(Context context) {
-//        this.context = context;
-//    }
 
     public int getMaxChoiceSize() {
         return maxChoiceSize;
@@ -64,8 +55,13 @@ public class Configuration implements Serializable{
     }
 
     public List<ImageModel> getImageList() {
+        if (imageList == null) {
+            imageList = new ArrayList<>();
+        }
         return imageList;
     }
+
+
 
     public void setImageList(List<ImageModel> imageList) {
         this.imageList = imageList;
@@ -73,26 +69,24 @@ public class Configuration implements Serializable{
 
     public String addSelectImage(ImageModel imageModel) {
         if (selectedList == null)
-            return "null";
+            return "selectedList is null";
         if (selectedList.size() >= maxChoiceSize){
             return "最多选择" + maxChoiceSize +"张图片";
         }
-        if (!selectedList.contains(imageModel))
+        if (!selectedList.contains(imageModel)){
             selectedList.add(imageModel);
-        return null;
+            LogUtil.i("添加成功");
+        }
+        return "";
     }
     public void removeSelectImage(ImageModel imageModel) {
         if (selectedList == null)
             return;
-        if (selectedList.contains(imageModel))
+        if (selectedList.contains(imageModel)) {
             selectedList.remove(imageModel);
+            LogUtil.i("移除成功");
+        }else{
+            LogUtil.i("移除失败");
+        }
     }
-
-    public static void setConfiguration(Configuration configuration) {
-        mConfiguration = configuration;
-    }
-    public static Configuration getConfiguration() {
-        return mConfiguration;
-    }
-
 }

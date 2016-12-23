@@ -4,21 +4,62 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <FrameLayout
-        android:id="@+id/frame_image_preview_top"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@null"></FrameLayout>
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/color_translucence"
+        android:orientation="horizontal">
 
-    <FrameLayout
-        android:id="@+id/frame_image_preview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-     ></FrameLayout>
+        <ImageButton
+            android:id="@+id/btnReturn"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:src="@drawable/icon_back_white" />
 
-    <FrameLayout
-        android:id="@+id/frame_image_preview_bottom"
+        <TextView
+            android:id="@+id/textTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:textColor="@color/color_white" />
+
+        <Button
+            android:id="@+id/btnOK"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:gravity="center"
+            android:padding="4dp"
+            android:text="完成"
+            android:textColor="@color/color_white" />
+    </LinearLayout>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"></FrameLayout>
+        android:layout_height="0dp"
+        android:layout_weight="7"
+        android:background="@color/color_black" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_alignParentBottom="true"
+        android:layout_weight="1"
+        android:background="@color/color_translucence"
+        android:gravity="center_vertical|right"
+        android:orientation="vertical">
+
+        <CheckBox
+            android:id="@+id/checkBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp" />
+    </LinearLayout>
+
+
 </LinearLayout>

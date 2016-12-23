@@ -26,13 +26,15 @@ public class HActivityManager {
     ///////////////////////////////////////////////////////////////////////////
     // activity life method
     ///////////////////////////////////////////////////////////////////////////
-    public void onCreate(Activity activity){
+    public void onCreate(Activity activity) {
         addActivity(activity);
     }
-    public void onResume(Activity activity){
+
+    public void onResume(Activity activity) {
         addActivity(activity);
     }
-    public void onDestory(Activity activity){
+
+    public void onDestroy(Activity activity) {
         removeActivity(activity);
     }
 
@@ -68,10 +70,13 @@ public class HActivityManager {
         return activity;
     }
 
-    private void finishAllActivity() {
+    public void finishAllActivity() {
         for (Activity activity : mActivityStack) {
-            activity.finish();
+            if (!activity.isFinishing()) {
+                activity.finish();
+            }
         }
+        mActivityStack.clear();
     }
 
 }

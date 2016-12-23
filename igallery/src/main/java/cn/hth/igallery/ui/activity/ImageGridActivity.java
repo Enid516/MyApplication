@@ -3,33 +3,38 @@ package cn.hth.igallery.ui.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
-import android.util.DisplayMetrics;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import java.util.List;
 
 import cn.hth.igallery.Configuration;
 import cn.hth.igallery.R;
 import cn.hth.igallery.model.ImageModel;
-import cn.hth.igallery.ui.fragment.ImageGridBottomFragment;
-import cn.hth.igallery.ui.fragment.ImageGridFragment;
-import cn.hth.igallery.ui.fragment.ImageGridTopFragment;
+import cn.hth.igallery.ui.adapter.ImageGridAdapter;
+import cn.hth.igallery.util.GalleryUtil;
 import cn.hth.igallery.util.ImageScanner;
-import cn.hth.igallery.util.LogUtil;
 
 /**
  * Created by Enid on 2016/9/7.
  * scanner image for select
  */
-public class ImageGridActivity extends BaseActivity {
+public class ImageGridActivity extends BaseActivity implements View.OnClickListener {
     private ImageScanner mScanner;
     private Activity mContext;
-    private ImageGridTopFragment imageGridTopFragment;
-    private ImageGridFragment imageGridFragment;
-    private ImageGridBottomFragment iamgeridBottomFragment;
     public static final String EXTRA_CONFIGURATION = "extra_configuration";
+    private RecyclerView recyclerView;
+    private ImageGridAdapter imageGridAdapter;
+    private static final int REQUEST_CODE = 0x1001;
+    private Button btnOK;
+    private TextView btnAllImage;
+    private TextView btnPreview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,23 +45,95 @@ public class ImageGridActivity extends BaseActivity {
     }
 
     private void init() {
+        initView();
         getIntentData();
-        mScanner = new ImageScanner(this, new ImageScanner.ImageScannerCallBack() {
-            @Override
-            public void onCompleted(List<ImageModel> imageList) {
-                if (imageList != null) {
-                    Configuration.getConfiguration().setImageList(imageList);
-                    addFragment();
-                }
-            }
-        });
+        setAdapter();
+        getScanImage();
+        if (mConfiguration.getChoiceModel() == Configuration.ImageChoiceModel.SINGLE) {
+            btnOK.setVisibility(View.INVISIBLE);
+            btnPreview.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void getIntentData() {
         Bundle bundle = getIntent().getExtras();
         Configuration configuration = (Configuration) bundle.getSerializable(EXTRA_CONFIGURATION);
-        Configuration.setConfiguration(configuration);
+        mConfiguration = configuration;
     }
+
+    private void getScanImage() {
+        mScanner = new ImageScanner(this, new ImageScanner.ImageScannerCallBack() {
+            @Override
+            public void onCompleted(List<ImageModel> imageList) {
+                if (imageList != null) {
+                    mConfiguration.setImageList(imageList);
+                    imageGridAdapter.setData(mConfiguration);
+                }
+            }
+        });
+    }
+
+    private void initView() {
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
+        recyclerView.setLayoutManager(gridLayoutManager);
+        btnOK = (Button) findViewById(R.id.btnOK);
+        btnAllImage = (TextView) findViewById(R.id.btnAllImage);
+        btnPreview = (TextView) findViewById(R.id.btnPreview);
+
+
+        //set click listener
+        findViewById(R.id.btnReturn).setOnClickListener(this);
+        btnOK.setOnClickListener(this);
+        btnAllImage.setOnClickListener(this);
+        btnPreview.setOnClickListener(this);
+    }
+
+    private void setAdapter() {
+        imageGridAdapter = new ImageGridAdapter(this, mConfiguration);
+        //register on item onclick listener
+        imageGridAdapter.setOnItemOnClickListener(new ImageGridAdapter.OnItemOnClickListener() {
+            @Override
+            public void onItemClick(View v, int position) {
+                startImagePreviewActivity(0, position);
+            }
+
+            @Override
+            public void onItemCheck() {
+                btnOK.setText(GalleryUtil.getBtnOKStirng(mConfiguration.getSelectedList().size(), mConfiguration.getMaxChoiceSize()));
+                btnPreview.setText(GalleryUtil.getBtnPreviewString(mConfiguration.getSelectedList().size()));
+            }
+        });
+        recyclerView.setAdapter(imageGridAdapter);
+    }
+
+    /**
+     * 跳转到图片预览界面
+     *
+     * @param type     0 预览所有图片
+     *                 1 预览已选图片
+     * @param position viewPager显示的当前页
+     */
+    private void startImagePreviewActivity(int type, int position) {
+        Intent intent = new Intent(this, ImagePreviewActivity.class);
+        intent.putExtra(ImagePreviewActivity.IMAGE_PREVIEW_TYPE_EXTRA, type);
+        intent.putExtra(ImagePreviewActivity.IMAGE_CURRENT_INDEX_EXTRA, position);
+        intent.putExtra(ImagePreviewActivity.IMAGE_CONFIGURATION_EXTRA, mConfiguration);
+        startActivityForResult(intent, REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
+            mConfiguration = (Configuration) data.getSerializableExtra(ImagePreviewActivity.IMAGE_CONFIGURATION_EXTRA);
+            imageGridAdapter.setData(mConfiguration);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // 存储卡访问权限
+    ///////////////////////////////////////////////////////////////////////////
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -94,65 +171,16 @@ public class ImageGridActivity extends BaseActivity {
         alertDialog.show();
     }
 
-    public void addFragment() {
-
-        //add statusFragment
-        if (imageGridTopFragment == null) {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            imageGridTopFragment = new ImageGridTopFragment();
-            imageGridTopFragment.setListener(new ImageGridTopFragment.ChoiceStatusFragmentCallBack() {
-                @Override
-                public void onBack() {
-                    finish();
-                }
-
-                @Override
-                public void onCompleted() {
-                    List<ImageModel> list = Configuration.getConfiguration().getSelectedList();
-                    LogUtil.i(" 选择的图片数量: " + list.size());
-                    for (int i = 0; i < list.size(); i++) {
-                        LogUtil.i("第" + (i + 1) + "张：" + list.get(i).getThumbnailSmallPath());
-                    }
-                }
-            });
-            ft.add(R.id.frame_image_grid_top, imageGridTopFragment).commit();
+    @Override
+    public void onClick(View v) {
+        int i = v.getId();
+        if (i == R.id.btnOK) {
+            finish();
+        } else if (i == R.id.btnReturn) {
+            finish();
+        } else if (i == R.id.btnPreview) {
+            if (mConfiguration.getSelectedList().size() > 0)
+                startImagePreviewActivity(1, 0);
         }
-        //add image grid fragment
-        if (imageGridFragment == null) {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            imageGridFragment = new ImageGridFragment();
-            imageGridFragment.setListener(new ImageGridFragment.ImageGridFragmentCallBack() {
-                @Override
-                public void onSelect() {
-                    imageGridTopFragment.setSelectSize();
-                    iamgeridBottomFragment.check();
-                }
-
-                @Override
-                public void onItemClick(int position) {
-                    ImagePreviewActivity.actionStart(ImageGridActivity.this,position);
-                }
-            });
-            ft.add(R.id.frame_image_scanner, imageGridFragment).commit();
-        }
-
-        //add grid bottom fragment
-        if (iamgeridBottomFragment == null) {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            iamgeridBottomFragment = new ImageGridBottomFragment();
-//            gridBottomBannerFragment.setListener(new ImageGridFragment.ImageGridFragmentCallBack() {
-//                @Override
-//                public void onSelect() {
-//                    imageChoiceStatusFragment.setSelectSize();
-//                }
-//            });
-            ft.add(R.id.frame_grid_bottom, iamgeridBottomFragment).commit();
-        }
-    }
-
-    public int getScreenWidth() {
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        return metrics.widthPixels;
     }
 }

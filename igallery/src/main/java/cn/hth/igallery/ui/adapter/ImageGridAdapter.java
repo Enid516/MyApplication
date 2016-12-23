@@ -34,13 +34,19 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.MyVi
     public interface OnItemOnClickListener {
         void onItemClick(View v, int position);
 
-        void onItenCheck();
+        void onItemCheck();
     }
 
     public ImageGridAdapter(Context context, Configuration configuration) {
         this.mContext = context;
         this.mConfiguration = configuration;
         this.mData = (ArrayList<ImageModel>) configuration.getImageList();
+    }
+
+    public void setData(Configuration configuration) {
+        this.mConfiguration = configuration;
+        mData = (ArrayList<ImageModel>) configuration.getImageList();
+        notifyDataSetChanged();
     }
 
     /**
@@ -64,21 +70,25 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.MyVi
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-
+        //如果是多选则显示checkBox
         if (mConfiguration.getChoiceModel() == Configuration.ImageChoiceModel.MULTIPLE) {
             holder.checkBox.setVisibility(View.VISIBLE);
+            holder.checkBox.setOnClickListener(new CheckBoxClickListener(mData.get(position)));
         } else {
             holder.checkBox.setVisibility(View.INVISIBLE);
         }
         holder.itemView.setTag(mData.get(position));
 
         ImageModel imageModel = mData.get(position);
+        //设置checkBox是否是选中状态
         holder.checkBox.setChecked(mConfiguration.getSelectedList() == null ? false : mConfiguration.getSelectedList().contains(imageModel));
+        //如果大缩略图图或小缩略图不存在，则去创建
         if (!new File(imageModel.getThumbnailBigPath()).exists() || !new File(imageModel.getThumbnailSmallPath()).exists()) {
             Job job = new ImageThumbnailJob(mContext, imageModel);
             RxJob.getInstance().addJob(job);
         }
 
+        //显示图片
         String path = imageModel.getThumbnailSmallPath();
         if (TextUtils.isEmpty(path)) {
             path = imageModel.getThumbnailBigPath();
@@ -94,26 +104,34 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.MyVi
         return mData == null ? 0 : mData.size();
     }
 
+    //checkBox click listener
     class CheckBoxClickListener implements View.OnClickListener {
-        MyViewHolder myViewHolder;
+        ImageModel mImageModel;
 
-        public CheckBoxClickListener(MyViewHolder holder) {
-            this.myViewHolder = holder;
+        public CheckBoxClickListener(ImageModel imageModel) {
+            this.mImageModel = imageModel;
         }
 
         @Override
         public void onClick(View v) {
-            if (myViewHolder.checkBox.isChecked()) {
-                String addMsg = mConfiguration.addSelectImage(mData.get(myViewHolder.getAdapterPosition()));
-                if (TextUtils.isEmpty(addMsg)) {
-                    Toast.makeText(mContext,addMsg,Toast.LENGTH_SHORT).show();
+            CheckBox checkBox = (CheckBox) v;
+            String message = "";
+            if (checkBox.isChecked()) {
+                message = mConfiguration.addSelectImage(mImageModel);
+                if (!TextUtils.isEmpty(message)) {
+                    Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
+                }
+                if (!mConfiguration.getSelectedList().contains(mImageModel)) {
+                    checkBox.setChecked(false);
                 }
             } else {
-                mConfiguration.removeSelectImage(mData.get(myViewHolder.getAdapterPosition()));
+                mConfiguration.removeSelectImage(mImageModel);
             }
+
             if (mOnItemOnClickListener != null) {
-                mOnItemOnClickListener.onItenCheck();
+                mOnItemOnClickListener.onItemCheck();
             }
+
         }
     }
 
@@ -126,7 +144,6 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.MyVi
             imageView = (ImageView) itemView.findViewById(R.id.image);
             checkBox = (CheckBox) itemView.findViewById(R.id.checkbox_image);
             imageView.setOnClickListener(this);
-            checkBox.setOnClickListener(new CheckBoxClickListener(this));
         }
 
         @Override

@@ -4,22 +4,87 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <FrameLayout
-        android:id="@+id/frame_image_grid_top"
+    <LinearLayout
+        android:id="@+id/layoutTop"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@null">
-    </FrameLayout>
+        android:layout_height="@dimen/comm_panel_height"
+        android:orientation="horizontal"
+        android:layout_weight="1"
+        android:background="@color/color_translucence">
+        <ImageButton
+            android:id="@+id/btnReturn"
+            android:src="@drawable/icon_back_white"
+            android:background="@null"
+            android:layout_width="60dp"
+            android:layout_height="match_parent" />
+        <TextView
+            android:gravity="center"
+            android:id="@+id/textTitle"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:text="图片"
+            android:textColor="@color/color_white"
+            android:layout_height="match_parent" />
+        <Button
+            android:gravity="center"
+            android:padding="4dp"
+            android:id="@+id/btnOK"
+            android:text="完成"
+            android:background="@null"
+            android:textColor="@color/color_white"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+    </LinearLayout>
 
-    <FrameLayout
-        android:layout_below="@id/frame_image_grid_top"
-        android:id="@+id/frame_image_scanner"
+    <LinearLayout
+        android:id="@+id/layoutBottom"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></FrameLayout>
-    <FrameLayout
-        android:layout_alignParentBottom="true"
-        android:id="@+id/frame_grid_bottom"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:layout_weight="1"
+        android:background="@color/color_translucence">
+        <TextView
+            android:gravity="center_vertical"
+            android:padding="4dp"
+            android:id="@+id/btnAllImage"
+            android:text="所有图片"
+            android:layout_weight="1"
+            android:background="@null"
+            android:textColor="@color/color_white"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+        <TextView
+            android:gravity="center"
+            android:padding="4dp"
+            android:id="@+id/btnPreview"
+            android:text="预览"
+            android:background="@null"
+            android:textColor="@color/color_white"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+    <android.support.v7.widget.RecyclerView
+        android:layout_below="@id/layoutTop"
+        android:background="@color/color_white"
+        android:layout_above="@id/layoutBottom"
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"></FrameLayout>
+        android:layout_height="0dp"
+        android:layout_weight="7"/>
+    <RelativeLayout
+        android:id="@+id/layoutBucketOverview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/layoutBottom"
+        android:paddingTop="?actionBarSize"
+        android:background="@color/color_translucence"
+        android:visibility="gone"
+        android:clickable="true">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerViewBucket"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/color_translucence"/>
+    </RelativeLayout>
 
 </RelativeLayout>

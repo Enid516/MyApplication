@@ -21,15 +21,86 @@ public class HFragmentManager {
         return mFragmentManager.beginTransaction();
     }
 
+
+    ///////////////////////////////////////////////////////////////////////////
+    //remove
+    ///////////////////////////////////////////////////////////////////////////
+    public HFragmentManager remove(Fragment... fragments) {
+        if (fragments != null && fragments.length > 0) {
+            FragmentTransaction fragmentTransaction = beginTransaction();
+            Fragment fragment = null;
+            for (int i = 0; i < fragments.length; i++) {
+                fragment = fragments[i];
+                if (fragment != null) {
+                    fragmentTransaction.remove(fragment);
+                }
+            }
+        }
+        return this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // add
+    ///////////////////////////////////////////////////////////////////////////
+    public Fragment add(int container, Class<? extends Fragment> fragmentClazz) {
+        return add(container, fragmentClazz, null, false);
+    }
+
+    public Fragment add(int container, Class<? extends Fragment> fragmentClazz, Bundle args) {
+        return add(container, fragmentClazz, args, false);
+    }
+
+    public Fragment add(int container, Class<? extends Fragment> fragmentClazz, boolean addToBackStack) {
+        return add(container, fragmentClazz, null, addToBackStack);
+    }
+
+    public Fragment add(int container, Class<? extends Fragment> fragmentClazz, Bundle args, boolean addToBackStack) {
+        Fragment fragment = mFragmentManager.findFragmentByTag(fragmentClazz.getSimpleName());
+        if (fragment == null) {
+            fragment = getNewFragment(fragmentClazz);
+        }
+        return add(container, fragment, args, addToBackStack);
+    }
+
+    public Fragment add(int container, Fragment fragment) {
+        return add(container, fragment, null, false);
+    }
+
+    public Fragment add(int container, Fragment fragment, Bundle args) {
+        return add(container, fragment, args, false);
+    }
+
+    public Fragment add(int container, Fragment fragment, boolean addToBackSack) {
+        return add(container, fragment, null, addToBackSack);
+    }
+
+    public Fragment add(int container, Fragment fragment, Bundle args, boolean addToBackStack) {
+        if (fragment != null) {
+            putFragmentData(fragment, args);
+            FragmentTransaction fragmentTransaction = beginTransaction();
+            String tag = fragment.getClass().getSimpleName();
+            fragmentTransaction.add(container, fragment, tag);
+            if (addToBackStack) {
+                fragmentTransaction.addToBackStack(null);
+            }
+            fragmentTransaction.commitAllowingStateLoss();
+        }
+        return fragment;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // replace 新的Fragment关联到某一个container
     ///////////////////////////////////////////////////////////////////////////
     public Fragment replace(int container, Class<? extends Fragment> fragmentClazz) {
-        return replace(container, fragmentClazz, null);
+        return replace(container, fragmentClazz, null, false);
     }
 
     public Fragment replace(int container, Class<? extends Fragment> fragmentClazz, Bundle args) {
         return replace(container, fragmentClazz, args, false);
+    }
+
+    public Fragment replace(int container, Class<? extends Fragment> fragmentClazz, boolean addToBackStack) {
+        return replace(container, fragmentClazz, null, addToBackStack);
     }
 
     public Fragment replace(int container, Class<? extends Fragment> fragmentClazz, Bundle args, boolean addToBackStack) {
@@ -41,14 +112,15 @@ public class HFragmentManager {
     }
 
     public Fragment replace(int container, Fragment fragment) {
-        return replace(container, fragment, null);
+        return replace(container, fragment, null, false);
+    }
+
+    public Fragment replace(int container, Fragment fragment, Bundle args) {
+        return replace(container, fragment, args, false);
     }
 
     public Fragment replace(int container, Fragment fragment, boolean addToBackStack) {
         return replace(container, fragment, null, addToBackStack);
-    }
-    public Fragment replace(int container, Fragment fragment, Bundle args) {
-        return replace(container, fragment, args, false);
     }
 
     public Fragment replace(int container, Fragment fragment, Bundle args, boolean addToBackStack) {
@@ -71,11 +143,15 @@ public class HFragmentManager {
     // 隐藏上一个显示的Fragment
     ///////////////////////////////////////////////////////////////////////////
     public Fragment toggle(int container, Fragment hideFragment, Class<? extends Fragment> showFragmentClazz) {
-        return toggle(container, hideFragment, showFragmentClazz, null);
+        return toggle(container, hideFragment, showFragmentClazz, null, false);
     }
 
     public Fragment toggle(int container, Fragment hideFragment, Class<? extends Fragment> showFragmentClazz, Bundle args) {
         return toggle(container, hideFragment, showFragmentClazz, args, false);
+    }
+
+    public Fragment toggle(int container, Fragment hideFragment, Class<? extends Fragment> showFragmentClazz, boolean addToBackStack) {
+        return toggle(container, hideFragment, showFragmentClazz, null, addToBackStack);
     }
 
     public Fragment toggle(int container, Fragment hideFragment, Class<? extends Fragment> showFragmentClazz, Bundle args, boolean addToBackStack) {
@@ -85,6 +161,43 @@ public class HFragmentManager {
             fragment = getNewFragment(showFragmentClazz);
         }
         return toggle(container, hideFragment, fragment, args, addToBackStack);
+    }
+
+    public Fragment toggle(int container, Fragment hideFragment, Fragment showFragment) {
+        return toggle(container, hideFragment, showFragment, null, false);
+    }
+
+    public Fragment toggle(int container, Fragment hideFragment, Fragment showFragment, Bundle args) {
+        return toggle(container, hideFragment, showFragment, args, false);
+    }
+
+    public Fragment toggle(int container, Fragment hideFragment, Fragment showFragment, boolean addToBackStack) {
+        return toggle(container, hideFragment, showFragment, null, addToBackStack);
+    }
+
+    public Fragment toggle(int container, Fragment hideFragment, Fragment showFragment, Bundle args, boolean addToBackStack) {
+        if (showFragment != null && showFragment != hideFragment) {
+            putFragmentData(showFragment, args);
+            FragmentTransaction fragmentTransaction = beginTransaction();
+            if (hideFragment == null) {
+                hideFragment = mFragmentLastToggle;
+            }
+            if (hideFragment != null) {
+                fragmentTransaction.hide(hideFragment);
+            }
+            if (!showFragment.isAdded() && container > 0) {
+                String tag = showFragment.getClass().getSimpleName();
+                fragmentTransaction.add(container, showFragment, tag);
+            } else {
+                fragmentTransaction.show(showFragment);
+            }
+            if (addToBackStack) {
+                fragmentTransaction.addToBackStack(null);
+            }
+            fragmentTransaction.commitAllowingStateLoss();
+        }
+        mFragmentLastToggle = showFragment;
+        return showFragment;
     }
 
     private Fragment getNewFragment(Class<? extends Fragment> showFragmentClazz) {
@@ -97,39 +210,6 @@ public class HFragmentManager {
             e.printStackTrace();
         }
         return fragment;
-    }
-
-    public Fragment toggle(int container, Fragment hideFragment, Fragment showFragment) {
-        return toggle(container, hideFragment, showFragment, null);
-    }
-
-    public Fragment toggle(int container, Fragment hideFragment, Fragment showFragment, Bundle args) {
-        return toggle(container, hideFragment, showFragment, args, false);
-    }
-
-    public Fragment toggle(int container, Fragment hideFragment, Fragment showFragment, Bundle args, boolean addToBackStack) {
-        if (showFragment != null && showFragment != hideFragment) {
-            String tag = showFragment.getClass().getSimpleName();
-            FragmentTransaction fragmentTransaction = beginTransaction();
-            putFragmentData(showFragment, args);
-            if (hideFragment == null) {
-                hideFragment = mFragmentLastToggle;
-            }
-            if (hideFragment != null) {
-                fragmentTransaction.hide(hideFragment);
-            }
-            if (!showFragment.isAdded() && container > 0) {
-                fragmentTransaction.add(container, showFragment, tag);
-            } else {
-                fragmentTransaction.show(showFragment);
-            }
-            if (addToBackStack) {
-                fragmentTransaction.addToBackStack(null);
-            }
-            fragmentTransaction.commitAllowingStateLoss();
-        }
-        mFragmentLastToggle = showFragment;
-        return showFragment;
     }
 
     private void putFragmentData(Fragment fragment, Bundle args) {

@@ -1,5 +1,7 @@
 package cn.hth.igallery.model;
 
+import android.text.TextUtils;
+
 /**
  * Created by Enid on 2016/9/8.
  */
@@ -39,5 +41,14 @@ public class BucketModel {
 
     public void setCover(String cover) {
         this.cover = cover;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || !(o instanceof BucketModel)) {
+            return false;
+        }
+        return TextUtils.equals(((BucketModel) o).bucketId,getBucketId());
     }
 }

@@ -1,5 +1,7 @@
 package cn.hth.igallery.model;
 
+import android.text.TextUtils;
+
 import java.io.Serializable;
 
 /**
@@ -9,6 +11,7 @@ import java.io.Serializable;
 public class ImageModel implements Serializable{
     private static final long serialVersionUID = -1;
     private String id;
+    private String bucketId;
     private String title;
     private String originalPath;
 
@@ -23,6 +26,14 @@ public class ImageModel implements Serializable{
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getBucketId() {
+        return bucketId;
+    }
+
+    public void setBucketId(String bucketId) {
+        this.bucketId = bucketId;
     }
 
     public String getTitle() {
@@ -55,5 +66,13 @@ public class ImageModel implements Serializable{
 
     public void setThumbnailSmallPath(String thumbnailSmallPath) {
         this.thumbnailSmallPath = thumbnailSmallPath;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || !(o instanceof ImageModel)) {
+            return false;
+        }
+        return TextUtils.equals(((ImageModel)o).id,getId());
     }
 }

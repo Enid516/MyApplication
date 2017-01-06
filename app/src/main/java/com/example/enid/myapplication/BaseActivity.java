@@ -1,15 +1,16 @@
 package com.example.enid.myapplication;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.RelativeLayout;
+
+import com.enid.library.permission.PermissionActivity;
 
 /**
  * Created by big_love on 2016/11/11.
  */
 
-public class BaseActivity extends Activity{
+public class BaseActivity extends PermissionActivity{
     protected SDSlidingFinishLayout mSDFinishLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {

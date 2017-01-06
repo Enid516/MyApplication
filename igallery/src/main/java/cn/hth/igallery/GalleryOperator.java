@@ -1,17 +1,33 @@
 package cn.hth.igallery;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.widget.Toast;
 
+import com.enid.library.utils.HLogUtil;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 import cn.hth.igallery.model.ImageModel;
+import cn.hth.igallery.rxbus.RxBus;
+import cn.hth.igallery.rxbus.RxBusResultSubscriber;
+import cn.hth.igallery.rxbus.RxBusSubscriber;
+import cn.hth.igallery.rxbus.event.ImageSelectedResult;
 import cn.hth.igallery.ui.activity.ImageGridActivity;
 import cn.hth.igallery.util.Utils;
+import rx.Subscription;
 
 /**
  * Created by Enid on 2016/9/21.
@@ -19,15 +35,18 @@ import cn.hth.igallery.util.Utils;
 public class GalleryOperator {
     private static GalleryOperator INSTANCE;
     private Configuration configuration = new Configuration();
+    private RxBusSubscriber mRxBusResultSubscriber;
+    private Subscription subscription;
+    private Context mContext;
+    public static final int REQUEST_CODE_OPEN_CAMERA = 2;
 
     private GalleryOperator() {
     }
 
-    public static GalleryOperator getInstance(Context context) {
+    public static GalleryOperator getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new GalleryOperator();
         }
-//        INSTANCE.configuration.setContext(context);
         return INSTANCE;
     }
 
@@ -54,14 +73,53 @@ public class GalleryOperator {
         if (context == null)
             return;
         if (!Utils.checkSD()) {
-            Toast.makeText(context, "SD卡不存在", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "SD card does not exist", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        if (mRxBusResultSubscriber == null) {
+            return;
+        }
+        subscription = RxBus.getInstance().
+                toObserverable(ImageSelectedResult.class)
+                .subscribe(mRxBusResultSubscriber);
+
         Intent intent = new Intent(context, ImageGridActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable(ImageGridActivity.EXTRA_CONFIGURATION, configuration);
         intent.putExtras(bundle);
         context.startActivity(intent);
+    }
+
+    public GalleryOperator subscribe(RxBusResultSubscriber<? extends ImageSelectedResult> rxBusResultSubscriber) {
+        this.mRxBusResultSubscriber = rxBusResultSubscriber;
+        return this;
+    }
+    private final String IMAGE_STORE_FILE_NAME = "IMG_%s.jpg";
+
+    /**
+     * open camera
+     * @param context
+     * @return
+     */
+    public String openCamera(Activity context) {
+        String imagePath = "";
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (intent.resolveActivity(context.getPackageManager()) != null) {
+            //set photo output path
+            File imageStoreDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/iGallery/");
+            if (!imageStoreDir.exists()) {
+                imageStoreDir.mkdirs();
+            }
+            String fileName = String.format(IMAGE_STORE_FILE_NAME, new SimpleDateFormat("yyyyMMddHHmmss", Locale.CHINA).format(new Date()));
+            imagePath = new File(imageStoreDir, fileName).getAbsolutePath();
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(imagePath)));
+            //open camera
+            context.startActivityForResult(intent,REQUEST_CODE_OPEN_CAMERA);
+        } else {
+            HLogUtil.e("the camera is not available");
+        }
+        return  imagePath;
     }
 
 }

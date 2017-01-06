@@ -15,12 +15,14 @@ import rx.schedulers.Schedulers;
 public class JobManager {
     private Queue<Job> jobQueue;
     private boolean queueFree = true;
+    private JobListener mJobListener;
 
     public JobManager() {
         jobQueue = new LinkedBlockingDeque<>();
     }
 
-    public void addJob(Job job) {
+    public void addJob(Job job,JobListener listener) {
+        this.mJobListener = listener;
         if (jobQueue.isEmpty() && queueFree) {
             jobQueue.offer(job);
             start();
@@ -52,15 +54,13 @@ public class JobManager {
 
                     @Override
                     public void onError(Throwable e) {
-
+                        mJobListener.onCreateFailed();
                     }
 
                     @Override
                     public void onNext(Job job) {
-
+                        mJobListener.onCreateSuccess(job);
                     }
                 });
     }
-
-
 }

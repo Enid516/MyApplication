@@ -8,6 +8,8 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CALL_PHONE"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <!--网络权限-->
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -38,6 +40,10 @@
         <activity android:name=".ImageSelectActivity" />
         <activity android:name=".fragmenttabhost.FragmentTabHostActivity" />
         <activity android:name=".fragmenttest.FragmentTestActivity"/>
+
+        <activity android:name="com.yalantis.ucrop.UCropActivity"/>
+
+
         <!--network connect change receiver-->
         <receiver android:name=".receiver.NetworkConnectChangeReceiver"/>
         <!-- ATTENTION: This was auto-generated to add Google Play services to your project for

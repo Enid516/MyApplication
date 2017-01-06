@@ -1,15 +1,17 @@
 package com.example.enid.myapplication;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
-import com.enid.library.dialog.CustomMultiSelectDialog;
+import com.enid.library.permission.PermissionListener;
 import com.example.enid.myapplication.dataS.BlockingQueueTest;
 import com.example.enid.myapplication.drawable.ShapeDrawableClass;
 import com.example.enid.myapplication.fragmenttabhost.FragmentTabHostActivity;
@@ -21,6 +23,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import cn.hth.igallery.job.ImageThumbnailJob;
+import cn.hth.igallery.job.Job;
+import cn.hth.igallery.job.JobListener;
+import cn.hth.igallery.job.RxJob;
+import cn.hth.igallery.model.ImageModel;
+import cn.hth.igallery.util.LogUtil;
 
 public class MainActivity extends BaseActivity {
 
@@ -61,20 +70,37 @@ public class MainActivity extends BaseActivity {
         }).run();
     }
 
-    private void register(){
+    public void testRequestPermission(View view) {
+        requestRuntimePermission(new String[]{Manifest.permission.CALL_PHONE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, new PermissionListener() {
+            @Override
+            public void onGranted() {
+                Toast.makeText(MainActivity.this, "granted all permission", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onDenied(List<String> permissions) {
+                for (String permission :
+                        permissions) {
+                    Toast.makeText(MainActivity.this, "denied " + permission + " permission ", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void register() {
         mReceiver = new NetworkConnectChangeReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
         intentFilter.addAction("android.net.wifi.WIFI_STATE_CHANGE");
         intentFilter.addAction("android.net.wifi.STATE_CHANGE");
-        registerReceiver(mReceiver,intentFilter);
+        registerReceiver(mReceiver, intentFilter);
     }
 
     private void initList() {
         listView = (ListView) findViewById(R.id.list);
         String[] from = new String[]{"key"};
         int[] to = new int[]{android.R.id.text1};
-        listView.setAdapter(new SimpleAdapter(this, getData(),R.layout.activity_list_item, from, to));
+        listView.setAdapter(new SimpleAdapter(this, getData(), R.layout.activity_list_item, from, to));
 
         listView.setOnItemClickListener((parent, view, position, id) -> {
             Intent intent = null;
@@ -89,16 +115,8 @@ public class MainActivity extends BaseActivity {
                     intent = new Intent(MainActivity.this, ListViewAnalyse.class);
                     break;
                 case 3:
-                    new CustomMultiSelectDialog.Builder(MainActivity.this)
-                            .setSelectItem(getResources().getString(R.string.get_from_photo), getResources().getString(R.string.take_photo))
-                            .setCancelButtonTitle(getResources().getString(R.string.cancel))
-                            .setListener((action, index) -> {
-                                if (index == 0) {
-                                    Intent intent1 = new Intent(MainActivity.this, ImageSelectActivity.class);
-                                    startActivity(intent1);
-                                }
-                            })
-                            .show();
+                    Intent intent1 = new Intent(MainActivity.this, ImageSelectActivity.class);
+                    startActivity(intent1);
                     break;
                 case 4:
                     intent = new Intent(MainActivity.this, FragmentTabHostActivity.class);

@@ -7,8 +7,9 @@
     android:background="@android:color/white"
     android:orientation="vertical"
     tools:context="com.example.enid.myapplication.MainActivity">
-    <TextView
+    <Button
         android:layout_width="match_parent"
+        android:onClick="testRequestPermission"
         android:text="TEST PADDING"
         android:includeFontPadding="true"
         android:textSize="40dp"

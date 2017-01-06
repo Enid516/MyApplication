@@ -17,6 +17,7 @@ import cn.hth.igallery.Configuration;
 import cn.hth.igallery.R;
 import cn.hth.igallery.job.ImageThumbnailJob;
 import cn.hth.igallery.job.Job;
+import cn.hth.igallery.job.JobListener;
 import cn.hth.igallery.job.RxJob;
 import cn.hth.igallery.model.ImageModel;
 import cn.hth.igallery.util.ImageLoaderUtils;
@@ -69,7 +70,7 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.MyVi
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
+    public void onBindViewHolder(final MyViewHolder holder, int position) {
         //如果是多选则显示checkBox
         if (mConfiguration.getChoiceModel() == Configuration.ImageChoiceModel.MULTIPLE) {
             holder.checkBox.setVisibility(View.VISIBLE);
@@ -79,24 +80,43 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.MyVi
         }
         holder.itemView.setTag(mData.get(position));
 
-        ImageModel imageModel = mData.get(position);
+        final ImageModel imageModel = mData.get(position);
         //设置checkBox是否是选中状态
         holder.checkBox.setChecked(mConfiguration.getSelectedList() == null ? false : mConfiguration.getSelectedList().contains(imageModel));
-        //如果大缩略图图或小缩略图不存在，则去创建
+        //如果大缩略图或小缩略图不存在，则去创建
         if (!new File(imageModel.getThumbnailBigPath()).exists() || !new File(imageModel.getThumbnailSmallPath()).exists()) {
             Job job = new ImageThumbnailJob(mContext, imageModel);
-            RxJob.getInstance().addJob(job);
+            RxJob.getInstance().addJob(job, new JobListener() {
+                @Override
+                public void onCreateSuccess(Job job) {
+                    //显示图片
+                    String path = imageModel.getThumbnailSmallPath();
+                    if (TextUtils.isEmpty(path)) {
+                        path = imageModel.getThumbnailBigPath();
+                    }
+                    if (TextUtils.isEmpty(path)) {
+                        path = imageModel.getOriginalPath();
+                    }
+                    ImageLoaderUtils.getInstance(mContext).displayImage(path, holder.imageView);
+                }
+
+                @Override
+                public void onCreateFailed() {
+
+                }
+            });
+        }else {
+            //显示图片
+            String path = imageModel.getThumbnailSmallPath();
+            if (TextUtils.isEmpty(path)) {
+                path = imageModel.getThumbnailBigPath();
+            }
+            if (TextUtils.isEmpty(path)) {
+                path = imageModel.getOriginalPath();
+            }
+            ImageLoaderUtils.getInstance(mContext).displayImage(path, holder.imageView);
         }
 
-        //显示图片
-        String path = imageModel.getThumbnailSmallPath();
-        if (TextUtils.isEmpty(path)) {
-            path = imageModel.getThumbnailBigPath();
-        }
-        if (TextUtils.isEmpty(path)) {
-            path = imageModel.getOriginalPath();
-        }
-        ImageLoaderUtils.getInstance(mContext).displayImage(path, holder.imageView);
     }
 
     @Override

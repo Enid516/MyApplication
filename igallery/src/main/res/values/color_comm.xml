@@ -3,4 +3,7 @@
     <color name="transparency">#00000000</color>
     <color name="color_white">#FFFFFF</color>
     <color name="color_black">#000000</color>
+
+
+    <color name="white_press">#FFFFFF</color>
 </resources>

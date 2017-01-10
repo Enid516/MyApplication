@@ -12,7 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
@@ -20,7 +20,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.enid.library.HLibrary;
+import com.enid.library.HLibraryConfig;
 import com.enid.library.permission.PermissionListener;
+import com.enid.library.utils.HViewUtil;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
@@ -36,20 +39,19 @@ import cn.hth.igallery.anim.SlideOutUnderneathAnimation;
 import cn.hth.igallery.model.BucketModel;
 import cn.hth.igallery.model.ImageModel;
 import cn.hth.igallery.rxbus.RxBus;
-import cn.hth.igallery.rxbus.event.ImageSelectedResult;
+import cn.hth.igallery.rxbus.event.ImageCropResultEvent;
+import cn.hth.igallery.rxbus.event.ImageMultipleResultEvent;
 import cn.hth.igallery.ui.adapter.BucketListAdapter;
 import cn.hth.igallery.ui.adapter.ImageGridAdapter;
 import cn.hth.igallery.util.GalleryUtil;
 import cn.hth.igallery.util.MediaUtil;
 import rx.Observer;
-import rx.Subscription;
 
 /**
  * Created by Enid on 2016/9/7.
  * scanner image for select
  */
 public class ImageGridActivity extends BaseActivity implements View.OnClickListener {
-    private Subscription subscription;
     private Activity mContext;
     public static final String EXTRA_CONFIGURATION = "extra_configuration";
     private RecyclerView recyclerView;
@@ -72,9 +74,7 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (subscription != null) {
-            subscription.unsubscribe();
-        }
+        RxBus.getInstance().clear();
     }
 
     private void init() {
@@ -86,6 +86,7 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
             btnOK.setVisibility(View.INVISIBLE);
             btnPreview.setVisibility(View.INVISIBLE);
         }
+
     }
 
     private void getImagesData() {
@@ -131,7 +132,7 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
                 imageGridAdapter.setData(mConfiguration);
             }
         };
-        MediaScannerHelper.generateImagesWithBucketId(subscription, observer, this, bucketId, 1, Integer.MAX_VALUE);
+        MediaScannerHelper.generateImagesWithBucketId(observer, this, bucketId, 1, Integer.MAX_VALUE);
     }
 
     private void getBuckets() {
@@ -162,14 +163,13 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
                             getImagesWithBucketId(bucketModel.getBucketId());
                         }
                         showBucketOverview(false);
-
                     }
                 });
                 bucketListAdapter.setSelectedBucket(bucketModels.get(0));
                 recyclerViewBucket.setAdapter(bucketListAdapter);
             }
         };
-        MediaScannerHelper.getImageBuckets(subscription, observer, this, 0, Integer.MAX_VALUE);
+        MediaScannerHelper.getImageBuckets(observer, this, 0, Integer.MAX_VALUE);
     }
 
     private void initView() {
@@ -181,7 +181,6 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
         recyclerViewBucket = (RecyclerView) findViewById(R.id.recyclerViewBucket);
         recyclerViewBucket.setLayoutManager(new LinearLayoutManager(this));
         layoutBucketOverview = (LinearLayout) findViewById(R.id.layoutBucketOverview);
-
 
         //set click listener
         findViewById(R.id.btnReturn).setOnClickListener(this);
@@ -230,16 +229,13 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
     }
 
     private static final String SAMPLE_CROPPED_IMAGE_NAME = "SampleCropImage";
+
     private void startCropActivity(Uri uri) {
         String destinationFileName = SAMPLE_CROPPED_IMAGE_NAME;
         destinationFileName += ".jpg";
-
-
         UCrop uCrop = UCrop.of(uri, Uri.fromFile(new File(getCacheDir(), destinationFileName)));
-
         uCrop = basisConfig(uCrop);
         uCrop = advancedConfig(uCrop);
-
         uCrop.start(ImageGridActivity.this);
     }
 
@@ -250,30 +246,8 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
      * @return - ucrop builder instance
      */
     private UCrop basisConfig(@NonNull UCrop uCrop) {
-//        switch (mRadioGroupAspectRatio.getCheckedRadioButtonId()) {
-//            case R.id.radio_origin:
-//
-//                break;
-//            case R.id.radio_square:
-//                uCrop = uCrop.withAspectRatio(1, 1);
-//                break;
-//            case R.id.radio_dynamic:
-//                // do nothing
-//                break;
-//            default:
-//                try {
-//                    float ratioX = Float.valueOf(mEditTextRatioX.getText().toString().trim());
-//                    float ratioY = Float.valueOf(mEditTextRatioY.getText().toString().trim());
-//                    if (ratioX > 0 && ratioY > 0) {
-//                        uCrop = uCrop.withAspectRatio(ratioX, ratioY);
-//                    }
-//                } catch (NumberFormatException e) {
-//                    Log.i(TAG, String.format("Number please: %s", e.getMessage()));
-//                }
-//                break;
-//        }
         uCrop = uCrop.useSourceImageAspectRatio();
-
+        uCrop = uCrop.withAspectRatio(1, 1);
         uCrop = uCrop.withMaxResultSize(1000, 1000);
 
         return uCrop;
@@ -289,22 +263,47 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
         UCrop.Options options = new UCrop.Options();
         options.setCompressionFormat(Bitmap.CompressFormat.JPEG);
         options.setCompressionQuality(100);
-
-        options.setHideBottomControls(false);
+        options.setHideBottomControls(true);
         options.setFreeStyleCropEnabled(false);
+
+        //color
+        HLibraryConfig config = HLibrary.getInstance().getHLibraryConfig();
+        options.setStatusBarColor(config.getmStatusBarColor());
+        options.setToolbarColor(config.getmToolbarColor());
+        options.setActiveWidgetColor(config.getmActiiveWidgetColor());
+        options.setToolbarWidgetColor(config.getmToolbarWidgetColor());
+        options.setCropFrameColor(config.getmCropFrameColor());
         return uCrop.withOptions(options);
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
+        if (requestCode == REQUEST_CODE){
             mConfiguration = (Configuration) data.getSerializableExtra(ImagePreviewActivity.IMAGE_CONFIGURATION_EXTRA);
-            imageGridAdapter.setData(mConfiguration);
+            if (resultCode == ImagePreviewActivity.RESULT_CODE_SELECTED) {
+                btnOK.setText(GalleryUtil.getBtnOKStirng(mConfiguration.getSelectedList().size(), mConfiguration.getMaxChoiceSize()));
+                btnPreview.setText(GalleryUtil.getBtnPreviewString(mConfiguration.getSelectedList().size()));
+                imageGridAdapter.setData(mConfiguration);
+            } else if (resultCode == ImagePreviewActivity.RESULT_CODE_COMPLETED) {
+                ImageMultipleResultEvent event = new ImageMultipleResultEvent(mConfiguration.getSelectedList());
+                RxBus.getInstance().post(event);
+                finish();
+            }
+        } else if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
+            final Uri resultUri = UCrop.getOutput(data);
+            if (resultUri != null) {
+                Toast.makeText(ImageGridActivity.this, "resultUri" + resultUri.toString(), Toast.LENGTH_SHORT).show();
+                ImageModel imageModel = new ImageModel();
+                imageModel.setOriginalPath(resultUri.getPath());
+                ImageCropResultEvent event = new ImageCropResultEvent(imageModel);
+                RxBus.getInstance().post(event);
+                finish();
+            } else {
+                Toast.makeText(ImageGridActivity.this, "toast_cannot_retrieve_cropped_image ", Toast.LENGTH_SHORT).show();
+            }
         }
     }
-
 
     private void showPermissionDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -330,7 +329,7 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
     public void onClick(View v) {
         int i = v.getId();
         if (i == R.id.btnOK) {
-            ImageSelectedResult imageSelectedResult = new ImageSelectedResult(mConfiguration.getSelectedList());
+            ImageMultipleResultEvent imageSelectedResult = new ImageMultipleResultEvent(mConfiguration.getSelectedList());
             RxBus.getInstance().post(imageSelectedResult);
             finish();
         } else if (i == R.id.btnReturn) {
@@ -355,6 +354,11 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
      */
     private void showBucketOverview(boolean isShow) {
         if (isShow) {
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            layoutParams.height = HViewUtil.getScreenHeight() / 4 * 3;
+            layoutParams.gravity = Gravity.BOTTOM;
+            recyclerViewBucket.setLayoutParams(layoutParams);
+
             layoutBucketOverview.setVisibility(View.VISIBLE);
             new SlideInUnderneathAnimation(recyclerViewBucket)
                     .setDirection(Animation.DIRECTION_DOWN)
@@ -372,7 +376,7 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
                     .setListener(new AnimationListener() {
                         @Override
                         public void onAnimationEnd(Animation animation) {
-                            layoutBucketOverview.setVisibility(View.GONE);
+                            layoutBucketOverview.setVisibility(View.INVISIBLE);
                         }
                     }).animate();
 

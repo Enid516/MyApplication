@@ -12,10 +12,10 @@ import cn.hth.igallery.model.ImageModel;
  *
  */
 
-public class ImageSelectedResult {
+public class ImageMultipleResultEvent implements BaseResultEvent{
     private List<ImageModel> imageModelList;
 
-    public ImageSelectedResult(List<ImageModel> imageModelList) {
+    public ImageMultipleResultEvent(List<ImageModel> imageModelList) {
         this.imageModelList = imageModelList;
     }
 

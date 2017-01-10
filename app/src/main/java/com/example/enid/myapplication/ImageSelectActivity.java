@@ -21,16 +21,12 @@ import java.util.List;
 
 import cn.hth.igallery.Configuration;
 import cn.hth.igallery.GalleryOperator;
-import cn.hth.igallery.job.ImageThumbnailJob;
-import cn.hth.igallery.job.Job;
-import cn.hth.igallery.job.JobListener;
-import cn.hth.igallery.job.RxJob;
 import cn.hth.igallery.model.ImageModel;
 import cn.hth.igallery.rxbus.RxBusResultSubscriber;
-import cn.hth.igallery.rxbus.event.ImageSelectedResult;
+import cn.hth.igallery.rxbus.event.ImageCropResultEvent;
+import cn.hth.igallery.rxbus.event.ImageMultipleResultEvent;
 import cn.hth.igallery.ui.adapter.RecyclerViewHolder;
 import cn.hth.igallery.util.ImageLoaderUtils;
-import cn.hth.igallery.util.LogUtil;
 
 /**
  * Created by Enid on 2016/9/21.
@@ -70,31 +66,6 @@ public class ImageSelectActivity extends BaseActivity {
             imageModelList.add(imageModel);
             mImageModelList.addAll(imageModelList);
             mAdapter.notifyDataSetChanged();
-
-
-            if (true)
-                return;
-            LogUtil.i("take success ,image path is %s" + imagePath);
-            Job job = new ImageThumbnailJob(ImageSelectActivity.this, imageModel);
-            RxJob.getInstance().addJob(job, new JobListener() {
-                @Override
-                public void onCreateSuccess(Job job) {
-                    LogUtil.i("onCreateSuccess");
-                    String path = imageModel.getThumbnailSmallPath();
-                    if (TextUtils.isEmpty(path)) {
-                        path = imageModel.getThumbnailBigPath();
-                    }
-                    if (TextUtils.isEmpty(path)) {
-                        path = imageModel.getOriginalPath();
-                    }
-                    LogUtil.i(String.format("thumbnail big path is %s,run Thread is %s", imageModel.getThumbnailBigPath(), Thread.currentThread().toString()));
-                }
-
-                @Override
-                public void onCreateFailed() {
-                    LogUtil.i("createFailed");
-                }
-            });
         }
     }
 
@@ -110,22 +81,33 @@ public class ImageSelectActivity extends BaseActivity {
                         Configuration.ImageChoiceModel choiceModel;
                         if (button.isChecked()) {
                             choiceModel = Configuration.ImageChoiceModel.SINGLE;
+                            GalleryOperator.getInstance()
+                                    .setChoiceModel(choiceModel)
+                                    .subscribe(new RxBusResultSubscriber<ImageCropResultEvent>() {
+                                        @Override
+                                        protected void onEvent(ImageCropResultEvent imageCropResultEvent) {
+                                            mImageModelList.clear();
+                                            mImageModelList.add(imageCropResultEvent.getImageModel());
+                                            mAdapter.notifyDataSetChanged();
+                                        }
+                                    })
+                                    .openGallery(ImageSelectActivity.this);
                         } else {
                             choiceModel = Configuration.ImageChoiceModel.MULTIPLE;
+                            GalleryOperator.getInstance()
+                                    .setChoiceModel(choiceModel)
+                                    .setMaxSize(9)
+                                    .selected(new ArrayList<>())
+                                    .subscribe(new RxBusResultSubscriber<ImageMultipleResultEvent>() {
+                                        @Override
+                                        protected void onEvent(ImageMultipleResultEvent imageSelectedResult) {
+                                            mImageModelList.clear();
+                                            mImageModelList.addAll(imageSelectedResult.getImageModelList());
+                                            mAdapter.notifyDataSetChanged();
+                                        }
+                                    })
+                                    .openGallery(ImageSelectActivity.this);
                         }
-                        GalleryOperator.getInstance()
-                                .setChoiceModel(choiceModel)
-                                .setMaxSize(9)
-                                .selected(new ArrayList<>())
-                                .subscribe(new RxBusResultSubscriber<ImageSelectedResult>() {
-                                    @Override
-                                    protected void onEvent(ImageSelectedResult imageSelectedResult) {
-                                        mImageModelList.clear();
-                                        mImageModelList.addAll(imageSelectedResult.getImageModelList());
-                                        mAdapter.notifyDataSetChanged();
-                                    }
-                                })
-                                .openGallery(ImageSelectActivity.this);
                     } else if (index == 1) {//take photo
                         requestRuntimePermission(new String[]{Manifest.permission.CAMERA}, new PermissionListener() {
 
@@ -163,7 +145,16 @@ public class ImageSelectActivity extends BaseActivity {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            ImageLoaderUtils.getInstance(ImageSelectActivity.this).displayImage(mData.get(holder.getAdapterPosition()).getThumbnailSmallPath(), holder.imageView);
+            String path = "";
+            ImageModel imageModel = mData.get(position);
+            path = imageModel.getThumbnailSmallPath();
+            if (TextUtils.isEmpty(path)) {
+                path = imageModel.getThumbnailBigPath();
+            }
+            if (TextUtils.isEmpty(path)) {
+                path = imageModel.getOriginalPath();
+            }
+            ImageLoaderUtils.getInstance(ImageSelectActivity.this).displayImage(path, holder.imageView);
         }
 
         @Override

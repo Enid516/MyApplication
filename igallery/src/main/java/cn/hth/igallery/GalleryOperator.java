@@ -9,7 +9,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.widget.Toast;
 
 import com.enid.library.utils.HLogUtil;
@@ -24,7 +23,9 @@ import cn.hth.igallery.model.ImageModel;
 import cn.hth.igallery.rxbus.RxBus;
 import cn.hth.igallery.rxbus.RxBusResultSubscriber;
 import cn.hth.igallery.rxbus.RxBusSubscriber;
-import cn.hth.igallery.rxbus.event.ImageSelectedResult;
+import cn.hth.igallery.rxbus.event.BaseResultEvent;
+import cn.hth.igallery.rxbus.event.ImageCropResultEvent;
+import cn.hth.igallery.rxbus.event.ImageMultipleResultEvent;
 import cn.hth.igallery.ui.activity.ImageGridActivity;
 import cn.hth.igallery.util.Utils;
 import rx.Subscription;
@@ -36,7 +37,6 @@ public class GalleryOperator {
     private static GalleryOperator INSTANCE;
     private Configuration configuration = new Configuration();
     private RxBusSubscriber mRxBusResultSubscriber;
-    private Subscription subscription;
     private Context mContext;
     public static final int REQUEST_CODE_OPEN_CAMERA = 2;
 
@@ -80,10 +80,17 @@ public class GalleryOperator {
         if (mRxBusResultSubscriber == null) {
             return;
         }
-        subscription = RxBus.getInstance().
-                toObserverable(ImageSelectedResult.class)
-                .subscribe(mRxBusResultSubscriber);
-
+        Subscription subscription;
+        if (configuration.getChoiceModel() == Configuration.ImageChoiceModel.SINGLE) {
+            subscription = RxBus.getInstance()
+                    .toObservable(ImageCropResultEvent.class)
+                    .subscribe(mRxBusResultSubscriber);
+        } else {
+            subscription = RxBus.getInstance()
+                    .toObservable(ImageMultipleResultEvent.class)
+                    .subscribe(mRxBusResultSubscriber);
+        }
+        RxBus.getInstance().add(subscription);
         Intent intent = new Intent(context, ImageGridActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable(ImageGridActivity.EXTRA_CONFIGURATION, configuration);
@@ -91,14 +98,16 @@ public class GalleryOperator {
         context.startActivity(intent);
     }
 
-    public GalleryOperator subscribe(RxBusResultSubscriber<? extends ImageSelectedResult> rxBusResultSubscriber) {
+    public GalleryOperator subscribe(RxBusResultSubscriber<? extends BaseResultEvent> rxBusResultSubscriber) {
         this.mRxBusResultSubscriber = rxBusResultSubscriber;
         return this;
     }
+
     private final String IMAGE_STORE_FILE_NAME = "IMG_%s.jpg";
 
     /**
      * open camera
+     *
      * @param context
      * @return
      */
@@ -115,11 +124,11 @@ public class GalleryOperator {
             imagePath = new File(imageStoreDir, fileName).getAbsolutePath();
             intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(imagePath)));
             //open camera
-            context.startActivityForResult(intent,REQUEST_CODE_OPEN_CAMERA);
+            context.startActivityForResult(intent, REQUEST_CODE_OPEN_CAMERA);
         } else {
             HLogUtil.e("the camera is not available");
         }
-        return  imagePath;
+        return imagePath;
     }
 
 }

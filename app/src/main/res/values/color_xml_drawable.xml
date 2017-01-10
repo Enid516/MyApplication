@@ -15,7 +15,7 @@
     <!-- 主题颜色按下颜色 -->
     <color name="main_color_press">@color/colorPrimary</color>
     <!--按钮不可用颜色-->
-    <color name="main_color_enable_false">#90e7444b</color>
+    <color name="main_color_enable_false">#999999</color>
     <!-- 圆角背景框颜色-->
     <color name="color_border">#e3e3e3</color>
     

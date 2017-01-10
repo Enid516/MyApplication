@@ -1,9 +1,11 @@
 package cn.hth.igallery.rxbus;
 
 import rx.Observable;
+import rx.Subscription;
 import rx.subjects.PublishSubject;
 import rx.subjects.SerializedSubject;
 import rx.subjects.Subject;
+import rx.subscriptions.CompositeSubscription;
 
 /**
  * Created by enid on 2017/1/5.
@@ -12,9 +14,11 @@ import rx.subjects.Subject;
 public class RxBus {
     private static volatile RxBus mInstance;
     private final Subject bus;
+    private CompositeSubscription compositeSubscription;
 
     public RxBus() {
         this.bus = new SerializedSubject<>(PublishSubject.create());
+        compositeSubscription = new CompositeSubscription();
     }
 
     /**
@@ -46,7 +50,30 @@ public class RxBus {
      * @param <T>
      * @return
      */
-    public <T>Observable<T> toObserverable(Class<T> eventType) {
+    public <T>Observable<T> toObservable(Class<T> eventType) {
         return bus.ofType(eventType);
+    }
+
+    /**
+     * 添加订阅
+     * @param subscription
+     */
+    public void add(Subscription subscription){
+        compositeSubscription.add(subscription);
+    }
+
+    /**
+     * 移除订阅
+     * @param subscription
+     */
+    public void remove(Subscription subscription) {
+        compositeSubscription.remove(subscription);
+    }
+
+    /**
+     * 移除所有订阅
+     */
+    public void clear() {
+        compositeSubscription.clear();
     }
 }

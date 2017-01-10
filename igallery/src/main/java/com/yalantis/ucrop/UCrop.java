@@ -15,13 +15,14 @@ import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.compat.BuildConfig;
 
 import com.yalantis.ucrop.model.AspectRatio;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
+
+import cn.hth.igallery.BuildConfig;
 
 /**
  * Created by Oleksii Shliama (https://github.com/shliama).

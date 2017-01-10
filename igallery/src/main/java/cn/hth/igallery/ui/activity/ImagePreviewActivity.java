@@ -28,8 +28,8 @@ import cn.hth.igallery.util.LogUtil;
  */
 
 public class ImagePreviewActivity extends BaseActivity implements View.OnClickListener {
-    public static final int IMAGE_PREVIEW_TYPE_ALL_EXTRA = 0;
-    public static final int IMAGE_PREVIEW_TYPE_SELECTED_EXTRA = 1;
+    public static final int RESULT_CODE_SELECTED = 0x00011;
+    public static final int RESULT_CODE_COMPLETED = 0x00012;
     public static final String IMAGE_CURRENT_INDEX_EXTRA = "imageCurrentIndex";
     public static final String IMAGE_PREVIEW_TYPE_EXTRA = "imagePreviewType";
     public static final String IMAGE_CONFIGURATION_EXTRA = "configuration";
@@ -62,6 +62,7 @@ public class ImagePreviewActivity extends BaseActivity implements View.OnClickLi
         }
         textTitle.setText((mCurrentIndex + 1) + "/" + previewList.size());
         btnOK.setText(GalleryUtil.getBtnOKStirng(mConfiguration.getSelectedList().size(), mConfiguration.getMaxChoiceSize()));
+        btnOK.setOnClickListener(this);
     }
 
     private void initView() {
@@ -168,9 +169,12 @@ public class ImagePreviewActivity extends BaseActivity implements View.OnClickLi
     public void onClick(View v) {
         int i = v.getId();
         if (i == R.id.btnOK) {
+            Intent data = new Intent();
+            data.putExtra(IMAGE_CONFIGURATION_EXTRA, mConfiguration);
+            setResult(RESULT_CODE_COMPLETED, data);
             finish();
         } else if (i == R.id.btnReturn) {
-            finish();
+            onBackPressed();
         }
     }
 
@@ -191,7 +195,7 @@ public class ImagePreviewActivity extends BaseActivity implements View.OnClickLi
         //所以这里setResult()要放到super.onBackPressed()之前
         Intent data = new Intent();
         data.putExtra(IMAGE_CONFIGURATION_EXTRA, mConfiguration);
-        setResult(RESULT_OK, data);
+        setResult(RESULT_CODE_SELECTED, data);
         super.onBackPressed();
     }
 }

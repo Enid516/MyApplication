@@ -17,7 +17,7 @@ public class RxJob {
         return INSTANCE;
     }
 
-    public void addJob(Job job,JobListener listener) {
-        jobManager.addJob(job,listener);
+    public void addJob(Job job) {
+        jobManager.addJob(job);
     }
 }

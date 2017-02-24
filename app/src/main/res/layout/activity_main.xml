@@ -20,10 +20,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="visible"></ListView>
-    <com.example.enid.myapplication.view.RemoteControlMenu
+    <com.example.enid.myapplication.view.PorterDuffXfermodeView
         android:layout_width="match_parent"
         android:layout_weight="1"
-        android:visibility="gone"
+        android:visibility="visible"
         android:layout_height="match_parent" />
     <TextView
         android:textColor="@color/main_color"

@@ -1,11 +1,13 @@
 package com.example.enid.myapplication;
 
 import android.Manifest;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -24,13 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cn.hth.igallery.job.ImageThumbnailJob;
-import cn.hth.igallery.job.Job;
-import cn.hth.igallery.job.JobListener;
-import cn.hth.igallery.job.RxJob;
-import cn.hth.igallery.model.ImageModel;
-import cn.hth.igallery.util.LogUtil;
-
 public class MainActivity extends BaseActivity {
 
     private ListView listView;
@@ -44,7 +39,27 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.layout_percent_framelayout);
         setContentView(R.layout.activity_main);
         init();
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        int heapSize = manager.getMemoryClass();
+        Log.i("Enid","the device heapSize is: " + heapSize);
+        InnerClass innerClass = new InnerClass();
+        innerClass.start();
     }
+
+    class InnerClass extends Thread {
+        @Override
+        public void run() {
+            super.run();
+            while (true) {
+                try {
+                    Thread.sleep(60 * 60 * 1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
 
     @Override
     protected void onDestroy() {

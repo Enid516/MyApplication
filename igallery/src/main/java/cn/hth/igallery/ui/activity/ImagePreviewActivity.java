@@ -9,9 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +21,8 @@ import cn.hth.igallery.Configuration;
 import cn.hth.igallery.R;
 import cn.hth.igallery.model.ImageModel;
 import cn.hth.igallery.util.GalleryUtil;
-import cn.hth.igallery.util.ImageLoaderUtils;
 import cn.hth.igallery.util.LogUtil;
+import uk.co.senab.photoview.PhotoView;
 
 /**
  * Created by Enid on 2016/10/17.
@@ -49,45 +50,29 @@ public class ImagePreviewActivity extends BaseActivity implements View.OnClickLi
     }
 
     private void init() {
-        initView();
-        getData();
-        initData();
-        setListener();
-        //设置进入activity显示的page
-        viewPager.setCurrentItem(mCurrentIndex);
-        if (mConfiguration.getChoiceModel() == Configuration.ImageChoiceModel.MULTIPLE) {
-            checkBox.setChecked(mConfiguration.getSelectedList().contains(previewList.get(mCurrentIndex)));
-        } else {
-            checkBox.setVisibility(View.GONE);
-        }
-        textTitle.setText((mCurrentIndex + 1) + "/" + previewList.size());
-        btnOK.setText(GalleryUtil.getBtnOKStirng(mConfiguration.getSelectedList().size(), mConfiguration.getMaxChoiceSize()));
-        btnOK.setOnClickListener(this);
-    }
-
-    private void initView() {
+        //init view
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         checkBox = (CheckBox) findViewById(R.id.checkBox);
-        findViewById(R.id.btnReturn).setOnClickListener(this);
         btnOK = (Button) findViewById(R.id.btnOK);
         textTitle = (TextView) findViewById(R.id.textTitle);
-    }
+        findViewById(R.id.btnReturn).setOnClickListener(this);
 
-    private void getData() {
+        //get data
         Intent data = getIntent();
         mCurrentIndex = data.getIntExtra(ImagePreviewActivity.IMAGE_CURRENT_INDEX_EXTRA, 0);
         mPreviewType = data.getIntExtra(ImagePreviewActivity.IMAGE_PREVIEW_TYPE_EXTRA, 0);
         mConfiguration = (Configuration) data.getSerializableExtra(ImagePreviewActivity.IMAGE_CONFIGURATION_EXTRA);
         previewList.addAll(mPreviewType == 0 ? mConfiguration.getImageList() : mConfiguration.getSelectedList());
-    }
 
-    private void initData() {
-        //生成ImageView集合
-        final List<ImageView> listView = new ArrayList<>();
-        ImageView imageView;
+        //init imageView list
+        final List<PhotoView> listView = new ArrayList<>();
+        PhotoView imageView;
         for (ImageModel image : previewList) {
-            imageView = new ImageView(this);
-            ImageLoaderUtils.getInstance(this).displayImage(image.getOriginalPath(), imageView);
+            imageView = new PhotoView(this);
+            Glide.with(this)
+                    .load(image.getOriginalPath())
+                    .centerCrop()
+                    .into(imageView);
             imageView.setOnClickListener(new ImageViewClickListener());
             listView.add(imageView);
         }
@@ -117,7 +102,26 @@ public class ImagePreviewActivity extends BaseActivity implements View.OnClickLi
                 container.removeView(listView.get(position));
             }
         });
+
+        //set listener
+        setListener();
+
+        //set the current index of viewPager
+        viewPager.setCurrentItem(mCurrentIndex);
+
+        //set choice model
+        if (mConfiguration.getChoiceModel() == Configuration.ImageChoiceModel.MULTIPLE) {
+            checkBox.setChecked(mConfiguration.getSelectedList().contains(previewList.get(mCurrentIndex)));
+        } else {
+            checkBox.setVisibility(View.GONE);
+        }
+
+        //init display
+        textTitle.setText((mCurrentIndex + 1) + "/" + previewList.size());
+        btnOK.setText(GalleryUtil.getBtnOKString(mConfiguration.getSelectedList().size(), mConfiguration.getMaxChoiceSize()));
+        btnOK.setOnClickListener(this);
     }
+
 
     private void setListener() {
         //添加页面改变监听
@@ -159,7 +163,7 @@ public class ImagePreviewActivity extends BaseActivity implements View.OnClickLi
                     } else {
                         mConfiguration.removeSelectImage(imageModel);
                     }
-                    btnOK.setText(GalleryUtil.getBtnOKStirng(mConfiguration.getSelectedList().size(), mConfiguration.getMaxChoiceSize()));
+                    btnOK.setText(GalleryUtil.getBtnOKString(mConfiguration.getSelectedList().size(), mConfiguration.getMaxChoiceSize()));
                 }
             });
         }

@@ -1,11 +1,11 @@
 package cn.hth.igallery.util;
 
 /**
- * Created by big_love on 2016/12/23.
+ * Created by enid on 2016/12/23.
  */
 
 public class GalleryUtil {
-    public static String getBtnOKStirng(int size, int limitSize) {
+    public static String getBtnOKString(int size, int limitSize) {
         String string = "完成";
         if (size == 0) {
             return string;

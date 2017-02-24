@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.enid.library.dialog.CustomMultiSelectDialog;
 import com.enid.library.permission.PermissionListener;
 import com.enid.library.utils.HViewUtil;
@@ -26,7 +27,6 @@ import cn.hth.igallery.rxbus.RxBusResultSubscriber;
 import cn.hth.igallery.rxbus.event.ImageCropResultEvent;
 import cn.hth.igallery.rxbus.event.ImageMultipleResultEvent;
 import cn.hth.igallery.ui.adapter.RecyclerViewHolder;
-import cn.hth.igallery.util.ImageLoaderUtils;
 
 /**
  * Created by Enid on 2016/9/21.
@@ -154,7 +154,10 @@ public class ImageSelectActivity extends BaseActivity {
             if (TextUtils.isEmpty(path)) {
                 path = imageModel.getOriginalPath();
             }
-            ImageLoaderUtils.getInstance(ImageSelectActivity.this).displayImage(path, holder.imageView);
+            Glide.with(ImageSelectActivity.this)
+                    .load(path)
+                    .centerCrop()
+                    .into(holder.imageView);
         }
 
         @Override

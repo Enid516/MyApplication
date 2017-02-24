@@ -2,11 +2,13 @@ package cn.hth.igallery.util;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -176,6 +178,16 @@ public class MediaUtil {
         File smallThumbFile = new File(storeFile, "thumbnail_small_" + FilenameUtils.getName(originalPath));
         return smallThumbFile;
     }
+
+//
+//    private void test() {
+//        try {
+//            ExifInterface exifInterface = new ExifInterface("");
+//            exifInterface.get
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 
 }

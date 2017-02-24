@@ -9,11 +9,12 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 import cn.hth.igallery.R;
 import cn.hth.igallery.model.BucketModel;
-import cn.hth.igallery.util.ImageLoaderUtils;
 import cn.hth.igallery.util.MediaUtil;
 
 /**
@@ -56,7 +57,10 @@ public class BucketListAdapter extends RecyclerView.Adapter<BucketListAdapter.My
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         BucketModel bucketModel = mData.get(position);
-        ImageLoaderUtils.getInstance(mContext).displayImage(bucketModel.getCover(), holder.imageBucketCover);
+        Glide.with(mContext)
+                .load(bucketModel.getCover())
+                .centerCrop()
+                .into(holder.imageBucketCover);
         holder.textBucketName.setText(bucketModel.getBucketName());
         if (!bucketModel.getBucketId().equals(MediaUtil.ALL_IMAGES_BUCKETID)) {
             holder.textBucketImagesSize.setText(bucketModel.getImageCount() + "张");

@@ -2,6 +2,8 @@ package cn.hth.igallery.ui.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+
+
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +12,8 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+
 import java.io.File;
 import java.util.ArrayList;
 
@@ -17,10 +21,8 @@ import cn.hth.igallery.Configuration;
 import cn.hth.igallery.R;
 import cn.hth.igallery.job.ImageThumbnailJob;
 import cn.hth.igallery.job.Job;
-import cn.hth.igallery.job.JobListener;
 import cn.hth.igallery.job.RxJob;
 import cn.hth.igallery.model.ImageModel;
-import cn.hth.igallery.util.ImageLoaderUtils;
 
 
 /**
@@ -86,36 +88,20 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.MyVi
         //如果大缩略图或小缩略图不存在，则去创建
         if (!new File(imageModel.getThumbnailBigPath()).exists() || !new File(imageModel.getThumbnailSmallPath()).exists()) {
             Job job = new ImageThumbnailJob(mContext, imageModel);
-            RxJob.getInstance().addJob(job, new JobListener() {
-                @Override
-                public void onCreateSuccess(Job job) {
-                    //显示图片
-                    String path = imageModel.getThumbnailSmallPath();
-                    if (TextUtils.isEmpty(path)) {
-                        path = imageModel.getThumbnailBigPath();
-                    }
-                    if (TextUtils.isEmpty(path)) {
-                        path = imageModel.getOriginalPath();
-                    }
-                    ImageLoaderUtils.getInstance(mContext).displayImage(path, holder.imageView);
-                }
-
-                @Override
-                public void onCreateFailed() {
-
-                }
-            });
-        }else {
-            //显示图片
-            String path = imageModel.getThumbnailSmallPath();
-            if (TextUtils.isEmpty(path)) {
-                path = imageModel.getThumbnailBigPath();
-            }
-            if (TextUtils.isEmpty(path)) {
-                path = imageModel.getOriginalPath();
-            }
-            ImageLoaderUtils.getInstance(mContext).displayImage(path, holder.imageView);
+            RxJob.getInstance().addJob(job);
         }
+        //显示图片
+        String path = imageModel.getThumbnailSmallPath();
+        if (TextUtils.isEmpty(path)) {
+            path = imageModel.getThumbnailBigPath();
+        }
+        if (TextUtils.isEmpty(path)) {
+            path = imageModel.getOriginalPath();
+        }
+        Glide.with(mContext)
+                .load(path)
+                .centerCrop()
+                .into(holder.imageView);
 
     }
 

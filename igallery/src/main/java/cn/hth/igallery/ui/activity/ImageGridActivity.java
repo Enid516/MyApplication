@@ -7,8 +7,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -63,6 +67,10 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
     private RecyclerView recyclerViewBucket;
     private LinearLayout layoutBucketOverview;
 
+    private int mCurrentPage = 0;
+    private static final int MAX_LIMIT = 50;
+    private SwipeRefreshLayout swipeRefreshLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,9 +86,51 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
     }
 
     private void init() {
-        initView();
-        getIntentData();
-        setAdapter();
+        //init view
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        btnOK = (Button) findViewById(R.id.btnOK);
+        btnAllImage = (TextView) findViewById(R.id.btnAllImage);
+        btnPreview = (TextView) findViewById(R.id.btnPreview);
+        recyclerViewBucket = (RecyclerView) findViewById(R.id.recyclerViewBucket);
+        recyclerViewBucket.setLayoutManager(new LinearLayoutManager(this));
+        layoutBucketOverview = (LinearLayout) findViewById(R.id.layoutBucketOverview);
+//        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+
+        //set click listener
+        findViewById(R.id.btnReturn).setOnClickListener(this);
+        btnOK.setOnClickListener(this);
+        btnAllImage.setOnClickListener(this);
+        btnPreview.setOnClickListener(this);
+        layoutBucketOverview.setOnClickListener(this);
+
+        //get intent data
+        Bundle bundle = getIntent().getExtras();
+        Configuration configuration = (Configuration) bundle.getSerializable(EXTRA_CONFIGURATION);
+        mConfiguration = configuration;
+
+        //set adapter
+        imageGridAdapter = new ImageGridAdapter(this, mConfiguration);
+        //register on item onclick listener
+        imageGridAdapter.setOnItemOnClickListener(new ImageGridAdapter.OnItemOnClickListener() {
+            @Override
+            public void onItemClick(View v, int position) {
+                if (mConfiguration.getChoiceModel() == Configuration.ImageChoiceModel.SINGLE) {
+                    String path = mConfiguration.getImageList().get(position).getOriginalPath();
+                    startCropActivity(Uri.fromFile(new File(path)));
+                } else {
+                    startImagePreviewActivity(0, position);
+                }
+            }
+
+            @Override
+            public void onItemCheck() {
+                btnOK.setText(GalleryUtil.getBtnOKString(mConfiguration.getSelectedList().size(), mConfiguration.getMaxChoiceSize()));
+                btnPreview.setText(GalleryUtil.getBtnPreviewString(mConfiguration.getSelectedList().size()));
+            }
+        });
+        recyclerView.setAdapter(imageGridAdapter);
+
         getImagesData();
         if (mConfiguration.getChoiceModel() == Configuration.ImageChoiceModel.SINGLE) {
             btnOK.setVisibility(View.INVISIBLE);
@@ -108,12 +158,6 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
         });
     }
 
-    private void getIntentData() {
-        Bundle bundle = getIntent().getExtras();
-        Configuration configuration = (Configuration) bundle.getSerializable(EXTRA_CONFIGURATION);
-        mConfiguration = configuration;
-    }
-
     private void getImagesWithBucketId(String bucketId) {
         Observer<List<ImageModel>> observer = new Observer<List<ImageModel>>() {
             @Override
@@ -128,11 +172,12 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
 
             @Override
             public void onNext(List<ImageModel> imageModels) {
-                mConfiguration.setImageList(imageModels);
+                mConfiguration.getImageList().addAll(imageModels);
                 imageGridAdapter.setData(mConfiguration);
+                imageGridAdapter.notifyDataSetChanged();
             }
         };
-        MediaScannerHelper.generateImagesWithBucketId(observer, this, bucketId, 1, Integer.MAX_VALUE);
+        MediaScannerHelper.generateImagesWithBucketId(observer, this, bucketId,mCurrentPage + 1, MAX_LIMIT);
     }
 
     private void getBuckets() {
@@ -170,47 +215,6 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
             }
         };
         MediaScannerHelper.getImageBuckets(observer, this, 0, Integer.MAX_VALUE);
-    }
-
-    private void initView() {
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
-        btnOK = (Button) findViewById(R.id.btnOK);
-        btnAllImage = (TextView) findViewById(R.id.btnAllImage);
-        btnPreview = (TextView) findViewById(R.id.btnPreview);
-        recyclerViewBucket = (RecyclerView) findViewById(R.id.recyclerViewBucket);
-        recyclerViewBucket.setLayoutManager(new LinearLayoutManager(this));
-        layoutBucketOverview = (LinearLayout) findViewById(R.id.layoutBucketOverview);
-
-        //set click listener
-        findViewById(R.id.btnReturn).setOnClickListener(this);
-        btnOK.setOnClickListener(this);
-        btnAllImage.setOnClickListener(this);
-        btnPreview.setOnClickListener(this);
-        layoutBucketOverview.setOnClickListener(this);
-    }
-
-    private void setAdapter() {
-        imageGridAdapter = new ImageGridAdapter(this, mConfiguration);
-        //register on item onclick listener
-        imageGridAdapter.setOnItemOnClickListener(new ImageGridAdapter.OnItemOnClickListener() {
-            @Override
-            public void onItemClick(View v, int position) {
-                if (mConfiguration.getChoiceModel() == Configuration.ImageChoiceModel.SINGLE) {
-                    String path = mConfiguration.getImageList().get(position).getOriginalPath();
-                    startCropActivity(Uri.fromFile(new File(path)));
-                } else {
-                    startImagePreviewActivity(0, position);
-                }
-            }
-
-            @Override
-            public void onItemCheck() {
-                btnOK.setText(GalleryUtil.getBtnOKStirng(mConfiguration.getSelectedList().size(), mConfiguration.getMaxChoiceSize()));
-                btnPreview.setText(GalleryUtil.getBtnPreviewString(mConfiguration.getSelectedList().size()));
-            }
-        });
-        recyclerView.setAdapter(imageGridAdapter);
     }
 
     /**
@@ -282,7 +286,7 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
         if (requestCode == REQUEST_CODE){
             mConfiguration = (Configuration) data.getSerializableExtra(ImagePreviewActivity.IMAGE_CONFIGURATION_EXTRA);
             if (resultCode == ImagePreviewActivity.RESULT_CODE_SELECTED) {
-                btnOK.setText(GalleryUtil.getBtnOKStirng(mConfiguration.getSelectedList().size(), mConfiguration.getMaxChoiceSize()));
+                btnOK.setText(GalleryUtil.getBtnOKString(mConfiguration.getSelectedList().size(), mConfiguration.getMaxChoiceSize()));
                 btnPreview.setText(GalleryUtil.getBtnPreviewString(mConfiguration.getSelectedList().size()));
                 imageGridAdapter.setData(mConfiguration);
             } else if (resultCode == ImagePreviewActivity.RESULT_CODE_COMPLETED) {

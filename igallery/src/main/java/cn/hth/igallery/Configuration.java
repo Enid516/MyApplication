@@ -1,8 +1,5 @@
 package cn.hth.igallery;
 
-import android.text.TextUtils;
-import android.widget.Toast;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +8,7 @@ import cn.hth.igallery.model.ImageModel;
 import cn.hth.igallery.util.LogUtil;
 
 /**
- * Created by Enid on 2016/9/21.
+ * Created by enid on 2016/9/21.
  * image select configuration
  */
 public class Configuration implements Serializable{
@@ -60,8 +57,6 @@ public class Configuration implements Serializable{
         }
         return imageList;
     }
-
-
 
     public void setImageList(List<ImageModel> imageList) {
         this.imageList = imageList;

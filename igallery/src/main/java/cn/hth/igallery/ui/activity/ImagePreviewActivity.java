@@ -7,12 +7,17 @@ import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.enid.library.utils.HLogUtil;
+import com.enid.library.utils.HViewUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +28,7 @@ import cn.hth.igallery.model.ImageModel;
 import cn.hth.igallery.util.GalleryUtil;
 import cn.hth.igallery.util.LogUtil;
 import uk.co.senab.photoview.PhotoView;
+import uk.co.senab.photoview.PhotoViewAttacher;
 
 /**
  * Created by Enid on 2016/10/17.
@@ -35,12 +41,12 @@ public class ImagePreviewActivity extends BaseActivity implements View.OnClickLi
     public static final String IMAGE_PREVIEW_TYPE_EXTRA = "imagePreviewType";
     public static final String IMAGE_CONFIGURATION_EXTRA = "configuration";
     private int mCurrentIndex;
-    private int mPreviewType;
     private ViewPager viewPager;
     private CheckBox checkBox;
     private List<ImageModel> previewList = new ArrayList<>();
     private Button btnOK;
     private TextView textTitle;
+    private LinearLayout layoutTop , layoutBottom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +58,8 @@ public class ImagePreviewActivity extends BaseActivity implements View.OnClickLi
     private void init() {
         //init view
         viewPager = (ViewPager) findViewById(R.id.viewpager);
+        layoutTop = (LinearLayout) findViewById(R.id.layoutTop);
+        layoutBottom = (LinearLayout) findViewById(R.id.layoutBottom);
         checkBox = (CheckBox) findViewById(R.id.checkBox);
         btnOK = (Button) findViewById(R.id.btnOK);
         textTitle = (TextView) findViewById(R.id.textTitle);
@@ -60,21 +68,21 @@ public class ImagePreviewActivity extends BaseActivity implements View.OnClickLi
         //get data
         Intent data = getIntent();
         mCurrentIndex = data.getIntExtra(ImagePreviewActivity.IMAGE_CURRENT_INDEX_EXTRA, 0);
-        mPreviewType = data.getIntExtra(ImagePreviewActivity.IMAGE_PREVIEW_TYPE_EXTRA, 0);
+        int mPreviewType = data.getIntExtra(ImagePreviewActivity.IMAGE_PREVIEW_TYPE_EXTRA, 0);
         mConfiguration = (Configuration) data.getSerializableExtra(ImagePreviewActivity.IMAGE_CONFIGURATION_EXTRA);
         previewList.addAll(mPreviewType == 0 ? mConfiguration.getImageList() : mConfiguration.getSelectedList());
 
         //init imageView list
         final List<PhotoView> listView = new ArrayList<>();
-        PhotoView imageView;
+        PhotoView photoView;
         for (ImageModel image : previewList) {
-            imageView = new PhotoView(this);
+            photoView = new PhotoView(this);
             Glide.with(this)
                     .load(image.getOriginalPath())
                     .centerCrop()
-                    .into(imageView);
-            imageView.setOnClickListener(new ImageViewClickListener());
-            listView.add(imageView);
+                    .into(photoView);
+            photoView.setOnPhotoTapListener(new ImageViewClickListener());
+            listView.add(photoView);
         }
 
         //set adapter
@@ -182,13 +190,68 @@ public class ImagePreviewActivity extends BaseActivity implements View.OnClickLi
         }
     }
 
-    class ImageViewClickListener implements View.OnClickListener {
-        public ImageViewClickListener() {
+    class ImageViewClickListener implements PhotoViewAttacher.OnPhotoTapListener {
 
+        @Override
+        public void onPhotoTap(View view, float x, float y) {
+            HLogUtil.i("click image");
+            TranslateAnimation animationTopIn = new TranslateAnimation(0, 0, -1000, 0);
+            animationTopIn.setDuration(500);
+            TranslateAnimation animationTopOut = new TranslateAnimation(0, 0, 0, -1000);
+            animationTopOut.setDuration(1000);
+            animationTopOut.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+
+            TranslateAnimation animationBottomIn = new TranslateAnimation(0, 0, HViewUtil.getScreenHeight(), HViewUtil.getScreenHeight() - HViewUtil.getViewHeight(layoutBottom));
+            animationBottomIn.setDuration(500);
+            TranslateAnimation animationBottomOut = new TranslateAnimation(0, 0, HViewUtil.getScreenHeight() - HViewUtil.getViewHeight(layoutBottom), HViewUtil.getScreenHeight());
+            animationBottomOut.setDuration(1000);
+            animationBottomOut.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+            if (layoutTop.getVisibility() == View.VISIBLE) {
+                layoutTop.setAnimation(animationTopOut);
+                layoutBottom.setAnimation(animationBottomOut);
+                layoutTop.setVisibility(View.INVISIBLE);
+                layoutBottom.setVisibility(View.INVISIBLE);
+            } else {
+                layoutTop.setVisibility(View.VISIBLE);
+                layoutBottom.setVisibility(View.VISIBLE);
+                layoutTop.setAnimation(animationTopIn);
+                layoutBottom.setAnimation(animationBottomIn);
+            }
         }
 
         @Override
-        public void onClick(View v) {
+        public void onOutsidePhotoTap() {
 
         }
     }

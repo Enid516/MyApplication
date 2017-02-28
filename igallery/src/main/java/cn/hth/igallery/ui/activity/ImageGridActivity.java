@@ -52,7 +52,7 @@ import cn.hth.igallery.util.MediaUtil;
 import rx.Observer;
 
 /**
- * Created by Enid on 2016/9/7.
+ * Created by enid on 2016/9/7.
  * scanner image for select
  */
 public class ImageGridActivity extends BaseActivity implements View.OnClickListener {
@@ -69,7 +69,6 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
 
     private int mCurrentPage = 0;
     private static final int MAX_LIMIT = 50;
-    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +94,6 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
         recyclerViewBucket = (RecyclerView) findViewById(R.id.recyclerViewBucket);
         recyclerViewBucket.setLayoutManager(new LinearLayoutManager(this));
         layoutBucketOverview = (LinearLayout) findViewById(R.id.layoutBucketOverview);
-//        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
 
         //set click listener
         findViewById(R.id.btnReturn).setOnClickListener(this);
@@ -136,7 +134,6 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
             btnOK.setVisibility(View.INVISIBLE);
             btnPreview.setVisibility(View.INVISIBLE);
         }
-
     }
 
     private void getImagesData() {

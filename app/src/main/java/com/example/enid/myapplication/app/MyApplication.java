@@ -10,6 +10,9 @@ import com.enid.library.HLibraryConfig;
 import com.enid.library.handler.CrashHandler;
 import com.enid.library.manager.HActivityManager;
 import com.example.enid.myapplication.R;
+import com.yanzhenjie.nohttp.OkHttpNetworkExecutor;
+import com.yolanda.nohttp.Logger;
+import com.yolanda.nohttp.NoHttp;
 
 /**
  * Created by big_love on 2016/11/25.
@@ -35,6 +38,14 @@ public class MyApplication extends Application{
     private void init() {
         HLibrary.getInstance().init(getInstance());
         initHLibraryConfig();
+
+        NoHttp.initialize(this,new NoHttp.Config()
+                .setConnectTimeout(2000)
+                .setReadTimeout(2000)
+                .setNetworkExecutor(new OkHttpNetworkExecutor()));
+        Logger.setDebug(true);//开启NoHttp调试模式
+        Logger.setTag("NoHttpTest");//设置NoHttp的Log的Tag
+//        NoHttp.initialize(this);//NoHttp默认初始化
 //        CrashHandler.getInstance().init();
     }
 

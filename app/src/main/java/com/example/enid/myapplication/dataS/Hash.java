@@ -16,8 +16,5 @@ public class Hash extends Activity{
         }
         return hash % prime;
     }
-    private void a() {
-//        Dictionary dictionary =
-    }
 }
 

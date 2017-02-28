@@ -3,34 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     android:background="@android:color/white"
+    android:gravity="center"
     android:orientation="vertical"
     tools:context="com.example.enid.myapplication.MainActivity">
-    <Button
-        android:layout_width="match_parent"
-        android:onClick="testRequestPermission"
-        android:text="TEST PADDING"
-        android:includeFontPadding="true"
-        android:textSize="40dp"
-        android:layout_height="wrap_content" />
 
     <ListView
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="visible"></ListView>
-    <com.example.enid.myapplication.view.PorterDuffXfermodeView
-        android:layout_width="match_parent"
-        android:layout_weight="1"
-        android:visibility="visible"
-        android:layout_height="match_parent" />
-    <TextView
-        android:textColor="@color/main_color"
-        android:text="drawable test"
-        android:id="@+id/drawable_view"
-        android:visibility="gone"
-        android:layout_width="200dp"
-        android:layout_height="200dp"/>
 
 </LinearLayout>

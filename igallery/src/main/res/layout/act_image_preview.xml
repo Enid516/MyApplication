@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+    <android.support.v4.view.ViewPager
+
+        android:id="@+id/viewpager"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:background="@color/color_black" />
+
+    <LinearLayout
+        android:id="@+id/layoutTop"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="top"
         android:background="@color/color_translucence"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:padding="10dp">
 
         <ImageButton
             android:id="@+id/btnReturn"
@@ -37,22 +46,18 @@
             android:textColor="@color/color_white" />
     </LinearLayout>
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/viewpager"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="7"
-        android:background="@color/color_black" />
-
 
     <LinearLayout
+        android:id="@+id/layoutBottom"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
         android:layout_weight="1"
         android:background="@color/color_translucence"
         android:gravity="center_vertical|right"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="10dp">
 
         <CheckBox
             android:id="@+id/checkBox"
@@ -62,4 +67,4 @@
     </LinearLayout>
 
 
-</LinearLayout>
+</FrameLayout>

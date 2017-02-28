@@ -34,6 +34,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".ui.UIActivity"/>
+        <activity android:name=".ui.PercentFrameLayoutActivity"/>
         <activity android:name=".ScrollViewActivity" />
         <activity android:name=".DividerListActivity" />
         <activity android:name=".view.ListViewAnalyse" />

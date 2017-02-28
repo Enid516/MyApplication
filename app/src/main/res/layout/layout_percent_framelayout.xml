@@ -6,26 +6,30 @@
     android:orientation="vertical">
 
     <Button
+        android:background="#ff0000"
         android:layout_gravity="left|top"
         android:text="Button1"
-        app:layout_heightPercent="50%"
-        app:layout_widthPercent="50%" />
+        app:layout_heightPercent="82%"
+        app:layout_widthPercent="30%" />
 
     <Button
+        android:background="#00ff00"
         android:layout_gravity="right|top"
         android:text="Button2"
-        app:layout_heightPercent="50%"
-        app:layout_widthPercent="50%" />
+        app:layout_heightPercent="18%"
+        app:layout_widthPercent="70%" />
 
     <Button
+        android:background="#0000ff"
         android:layout_gravity="left|bottom"
         android:text="Button3"
-        app:layout_heightPercent="50%"
-        app:layout_widthPercent="50%" />
+        app:layout_heightPercent="18%"
+        app:layout_widthPercent="70%" />
 
     <Button
         android:layout_gravity="right|bottom"
         android:text="Button4"
-        app:layout_heightPercent="50%"
-        app:layout_widthPercent="50%" />
+        android:background="#ffffff"
+        app:layout_heightPercent="82%"
+        app:layout_widthPercent="30%" />
 </android.support.percent.PercentFrameLayout>

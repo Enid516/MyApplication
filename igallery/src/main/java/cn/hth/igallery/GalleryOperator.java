@@ -37,7 +37,7 @@ public class GalleryOperator {
     private static GalleryOperator INSTANCE;
     private Configuration configuration = new Configuration();
     private RxBusSubscriber mRxBusResultSubscriber;
-    private Context mContext;
+//    private Context mContext;
     public static final int REQUEST_CODE_OPEN_CAMERA = 2;
 
     private GalleryOperator() {

@@ -13,7 +13,7 @@ import com.enid.library.utils.HLogUtil;
 import cn.hth.igallery.util.LogUtil;
 
 /**
- * Created by big_love on 2016/12/12.
+ * Created by enid on 2016/12/12.
  */
 
 public class NetworkConnectChangeReceiver extends BroadcastReceiver {
@@ -22,6 +22,7 @@ public class NetworkConnectChangeReceiver extends BroadcastReceiver {
         //监听wifi是否打开，与是否连接成功没有关系
         if (WifiManager.WIFI_STATE_CHANGED_ACTION.equals(intent.getAction())) {
             int intExtra = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, 0);
+            HLogUtil.i("wifi manager extra_wifi_state");
             switch (intExtra) {
                 case WifiManager.WIFI_STATE_DISABLING:
                     break;
@@ -56,6 +57,7 @@ public class NetworkConnectChangeReceiver extends BroadcastReceiver {
 
         if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
             NetworkInfo networkInfo = (NetworkInfo) intent.getSerializableExtra(ConnectivityManager.EXTRA_NETWORK);
+//            NetworkInfo.State state = networkInfo.getState();
         }
     }
 }

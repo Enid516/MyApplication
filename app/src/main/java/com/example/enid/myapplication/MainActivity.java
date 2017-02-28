@@ -1,25 +1,14 @@
 package com.example.enid.myapplication;
 
-import android.Manifest;
-import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.util.Log;
-import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.Toast;
 
-import com.enid.library.permission.PermissionListener;
-import com.example.enid.myapplication.dataS.BlockingQueueTest;
-import com.example.enid.myapplication.drawable.ShapeDrawableClass;
-import com.example.enid.myapplication.fragmenttabhost.FragmentTabHostActivity;
-import com.example.enid.myapplication.fragmenttest.FragmentTestActivity;
 import com.example.enid.myapplication.receiver.NetworkConnectChangeReceiver;
-import com.example.enid.myapplication.view.ListViewAnalyse;
+import com.example.enid.myapplication.ui.UIActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,39 +16,22 @@ import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends BaseActivity {
-
     private ListView listView;
     private NetworkConnectChangeReceiver mReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        register();
         SystemClock.sleep(2000);
-        setContentView(R.layout.layout_percent_framelayout);
         setContentView(R.layout.activity_main);
+        register();
         init();
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        int heapSize = manager.getMemoryClass();
-        Log.i("Enid","the device heapSize is: " + heapSize);
-        InnerClass innerClass = new InnerClass();
-        innerClass.start();
     }
 
-    class InnerClass extends Thread {
-        @Override
-        public void run() {
-            super.run();
-            while (true) {
-                try {
-                    Thread.sleep(60 * 60 * 1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
-
 
     @Override
     protected void onDestroy() {
@@ -69,37 +41,7 @@ public class MainActivity extends BaseActivity {
 
     private void init() {
         initList();
-        testDrawable();
         register();
-    }
-
-    private void testDrawable() {
-        View viewById = findViewById(R.id.drawable_view);
-        viewById.setBackgroundDrawable(ShapeDrawableClass.getShapeDrawable());
-    }
-
-    private void testCrash() {
-        new Thread(() -> {
-            BlockingQueueTest test = new BlockingQueueTest();
-            test.offerExit("hello");
-        }).run();
-    }
-
-    public void testRequestPermission(View view) {
-        requestRuntimePermission(new String[]{Manifest.permission.CALL_PHONE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, new PermissionListener() {
-            @Override
-            public void onGranted() {
-                Toast.makeText(MainActivity.this, "granted all permission", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onDenied(List<String> permissions) {
-                for (String permission :
-                        permissions) {
-                    Toast.makeText(MainActivity.this, "denied " + permission + " permission ", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
     }
 
     private void register() {
@@ -116,65 +58,23 @@ public class MainActivity extends BaseActivity {
         String[] from = new String[]{"key"};
         int[] to = new int[]{android.R.id.text1};
         listView.setAdapter(new SimpleAdapter(this, getData(), R.layout.activity_list_item, from, to));
-
         listView.setOnItemClickListener((parent, view, position, id) -> {
-            Intent intent = null;
-            switch (position) {
-                case 0:
-                    intent = new Intent(MainActivity.this, ScrollViewActivity.class);
-                    break;
-                case 1:
-                    intent = new Intent(MainActivity.this, DividerListActivity.class);
-                    break;
-                case 2:
-                    intent = new Intent(MainActivity.this, ListViewAnalyse.class);
-                    break;
-                case 3:
-                    Intent intent1 = new Intent(MainActivity.this, ImageSelectActivity.class);
-                    startActivity(intent1);
-                    break;
-                case 4:
-                    intent = new Intent(MainActivity.this, FragmentTabHostActivity.class);
-                    break;
-                case 5:
-                    intent = new Intent(MainActivity.this, FragmentTestActivity.class);
-                    break;
-                default:
-                    break;
-            }
-            testCrash();
-
+            Class clazz = classArray[position];
+            Intent intent = new Intent(MainActivity.this, clazz);
             if (intent != null) {
                 startActivity(intent);
             }
         });
     }
-
+    private Class[] classArray = new Class[]{UIActivity.class, ImageSelectActivity.class};
     private List<Map<String, String>> getData() {
+        String[] titles = new String[]{"UI","iGallery"};
         List<Map<String, String>> data = new ArrayList<>();
-        Map<String, String> map1 = new HashMap<>();
-        map1.put("key", "Scroll View");
-        data.add(map1);
-
-        Map<String, String> map2 = new HashMap<>();
-        map2.put("key", "Divider ListView");
-        data.add(map2);
-
-        Map<String, String> map3 = new HashMap<>();
-        map3.put("key", "ListView Test");
-        data.add(map3);
-
-        Map<String, String> map4 = new HashMap<>();
-        map4.put("key", "iGallery");
-        data.add(map4);
-
-        Map<String, String> map5 = new HashMap<>();
-        map5.put("key", "FragmentTabHost");
-        data.add(map5);
-
-        Map<String, String> map6 = new HashMap<>();
-        map6.put("key", "FragmentTest");
-        data.add(map6);
+        for (int i = 0; i < titles.length; i++) {
+            Map<String, String> map = new HashMap<>();
+            map.put("key", titles[i]);
+            data.add(map);
+        }
         return data;
     }
 }

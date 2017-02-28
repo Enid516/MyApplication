@@ -26,7 +26,7 @@ import cn.hth.igallery.model.ImageModel;
 
 
 /**
- * Created by Enid on 2016/9/9.
+ * Created by enid on 2016/9/9.
  */
 public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.MyViewHolder> {
     private Context mContext;
@@ -52,14 +52,6 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.MyVi
         notifyDataSetChanged();
     }
 
-    /**
-     * 实现recyclerView 的OnItemOnClickListener监听
-     * 原理是:
-     * 获取item的View并调用setOnClickListener方法，在onClick中调用{@link OnItemOnClickListener}对象
-     * 的onItemClick方法。使用时，只需相应的adapter调用setOnItemOnClickListener（OnItemOnClickListener listener）方法即可。
-     *
-     * @param listener
-     */
     public void setOnItemOnClickListener(OnItemOnClickListener listener) {
         this.mOnItemOnClickListener = listener;
     }
@@ -73,23 +65,22 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.MyVi
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
-        //如果是多选则显示checkBox
+        final ImageModel imageModel = mData.get(position);
+        //设置是否显示checkBox
         if (mConfiguration.getChoiceModel() == Configuration.ImageChoiceModel.MULTIPLE) {
             holder.checkBox.setVisibility(View.VISIBLE);
+            holder.checkBox.setChecked(mConfiguration.getSelectedList() == null ? false : mConfiguration.getSelectedList().contains(imageModel));//设置checkBox是否是选中状态
             holder.checkBox.setOnClickListener(new CheckBoxClickListener(mData.get(position)));
         } else {
             holder.checkBox.setVisibility(View.INVISIBLE);
         }
-        holder.itemView.setTag(mData.get(position));
 
-        final ImageModel imageModel = mData.get(position);
-        //设置checkBox是否是选中状态
-        holder.checkBox.setChecked(mConfiguration.getSelectedList() == null ? false : mConfiguration.getSelectedList().contains(imageModel));
         //如果大缩略图或小缩略图不存在，则去创建
         if (!new File(imageModel.getThumbnailBigPath()).exists() || !new File(imageModel.getThumbnailSmallPath()).exists()) {
             Job job = new ImageThumbnailJob(mContext, imageModel);
             RxJob.getInstance().addJob(job);
         }
+
         //显示图片
         String path = imageModel.getThumbnailSmallPath();
         if (TextUtils.isEmpty(path)) {
@@ -113,7 +104,6 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.MyVi
     //checkBox click listener
     class CheckBoxClickListener implements View.OnClickListener {
         ImageModel mImageModel;
-
         public CheckBoxClickListener(ImageModel imageModel) {
             this.mImageModel = imageModel;
         }
@@ -121,9 +111,8 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.MyVi
         @Override
         public void onClick(View v) {
             CheckBox checkBox = (CheckBox) v;
-            String message = "";
             if (checkBox.isChecked()) {
-                message = mConfiguration.addSelectImage(mImageModel);
+                String message = mConfiguration.addSelectImage(mImageModel);
                 if (!TextUtils.isEmpty(message)) {
                     Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
                 }
@@ -133,11 +122,9 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.MyVi
             } else {
                 mConfiguration.removeSelectImage(mImageModel);
             }
-
             if (mOnItemOnClickListener != null) {
                 mOnItemOnClickListener.onItemCheck();
             }
-
         }
     }
 

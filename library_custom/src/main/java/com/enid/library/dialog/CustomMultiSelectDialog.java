@@ -12,7 +12,6 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.enid.library.HLibrary;
 import com.enid.library.R;
 import com.enid.library.utils.HViewUtil;
 
@@ -32,7 +31,7 @@ public class CustomMultiSelectDialog extends AlertDialog implements View.OnClick
     private DialogActionListener mListener;
     private TextView itemCancel;
 
-    protected CustomMultiSelectDialog(Context context, Bundle bundle) {
+    private CustomMultiSelectDialog(Context context, Bundle bundle) {
         super(context);
         this.mContext = context;
         this.bundleBuilder = bundle;
@@ -148,7 +147,7 @@ public class CustomMultiSelectDialog extends AlertDialog implements View.OnClick
             return dialog;
         }
 
-        public Bundle prepareArguments() {
+        Bundle prepareArguments() {
             Bundle bundle = new Bundle();
             bundle.putString(ARG_CANCEL_BUTTON_TITLE, cancelTitle);
             bundle.putStringArray(ARG_ITEM_BUTTON_TITLES, selectItems);
@@ -163,7 +162,7 @@ public class CustomMultiSelectDialog extends AlertDialog implements View.OnClick
         }
     }
 
-    public static interface DialogActionListener {
+    public interface DialogActionListener {
         void onSelectItemClick(CustomMultiSelectDialog action, int index);
     }
 }

@@ -59,8 +59,7 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.MyVi
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.item_gv_frag_image, parent, false);
-        MyViewHolder myViewHolder = new MyViewHolder(view);
-        return myViewHolder;
+        return new MyViewHolder(view);
     }
 
     @Override
@@ -69,7 +68,7 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.MyVi
         //设置是否显示checkBox
         if (mConfiguration.getChoiceModel() == Configuration.ImageChoiceModel.MULTIPLE) {
             holder.checkBox.setVisibility(View.VISIBLE);
-            holder.checkBox.setChecked(mConfiguration.getSelectedList() == null ? false : mConfiguration.getSelectedList().contains(imageModel));//设置checkBox是否是选中状态
+            holder.checkBox.setChecked(mConfiguration.getSelectedList() != null && mConfiguration.getSelectedList().contains(imageModel));//设置checkBox是否是选中状态
             holder.checkBox.setOnClickListener(new CheckBoxClickListener(mData.get(position)));
         } else {
             holder.checkBox.setVisibility(View.INVISIBLE);
@@ -102,9 +101,9 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.MyVi
     }
 
     //checkBox click listener
-    class CheckBoxClickListener implements View.OnClickListener {
+    private class CheckBoxClickListener implements View.OnClickListener {
         ImageModel mImageModel;
-        public CheckBoxClickListener(ImageModel imageModel) {
+        CheckBoxClickListener(ImageModel imageModel) {
             this.mImageModel = imageModel;
         }
 
@@ -132,7 +131,7 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.MyVi
         ImageView imageView;
         CheckBox checkBox;
 
-        public MyViewHolder(View itemView) {
+        MyViewHolder(View itemView) {
             super(itemView);
             imageView = (ImageView) itemView.findViewById(R.id.image);
             checkBox = (CheckBox) itemView.findViewById(R.id.checkbox_image);

@@ -16,14 +16,14 @@ public class RxBus {
     private final Subject bus;
     private CompositeSubscription compositeSubscription;
 
-    public RxBus() {
+    private RxBus() {
         this.bus = new SerializedSubject<>(PublishSubject.create());
         compositeSubscription = new CompositeSubscription();
     }
 
     /**
      * 单例模式
-     * @return
+     * @return RxBus
      */
     public static RxBus getInstance() {
         if (mInstance == null) {
@@ -38,7 +38,7 @@ public class RxBus {
 
     /**
      * 发送消息
-     * @param object
+     * @param object eventObject
      */
     public void post(Object object) {
         bus.onNext(object);

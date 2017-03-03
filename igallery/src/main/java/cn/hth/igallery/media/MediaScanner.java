@@ -15,7 +15,7 @@ public class MediaScanner {
     private MediaScannerConnection.MediaScannerConnectionClient mediaScannerConnectionClient;
     private MediaScannerConnection mediaScannerConnection;
     private MediaScannerCallBack mediaScannerCallBack;
-    public String[] filePaths = null;
+    private String[] filePaths = null;
     private String fileType = null;
 
     public MediaScanner(Context context) {
@@ -27,7 +27,7 @@ public class MediaScanner {
         }
     }
 
-    public class ScannerConnectionClient implements MediaScannerConnection.MediaScannerConnectionClient {
+    private class ScannerConnectionClient implements MediaScannerConnection.MediaScannerConnectionClient {
 
         @Override
         public void onMediaScannerConnected() {
@@ -54,22 +54,22 @@ public class MediaScanner {
         scanImage(Environment.getExternalStorageDirectory().getAbsolutePath(), mediaScannerCallBack);
     }
 
-    public void scanImage(String path,MediaScannerCallBack mediaScannerCallBack) {
+    private void scanImage(String path, MediaScannerCallBack mediaScannerCallBack) {
         scanImage(new String[]{path},mediaScannerCallBack);
     }
 
-    public void scanImage(String[] path,MediaScannerCallBack mediaScannerCallBack) {
+    private void scanImage(String[] path, MediaScannerCallBack mediaScannerCallBack) {
         scanFile(path, "image/jpeg",mediaScannerCallBack);
     }
 
-    public void scanFile(String[] path, String fileType,MediaScannerCallBack mediaScannerCallBack) {
+    private void scanFile(String[] path, String fileType, MediaScannerCallBack mediaScannerCallBack) {
         this.filePaths = path;
         this.fileType = fileType;
         this.mediaScannerCallBack = mediaScannerCallBack;
         mediaScannerConnection.connect();
     }
 
-    public interface MediaScannerCallBack{
+    interface MediaScannerCallBack{
         void onScanCompleted(String[] path);
     }
 

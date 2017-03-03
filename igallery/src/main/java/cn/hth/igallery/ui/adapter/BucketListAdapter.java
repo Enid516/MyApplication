@@ -50,8 +50,7 @@ public class BucketListAdapter extends RecyclerView.Adapter<BucketListAdapter.My
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.item_lv_bucket, null);
-        MyViewHolder holder = new MyViewHolder(view);
-        return holder;
+        return new MyViewHolder(view);
     }
 
     @Override
@@ -84,7 +83,7 @@ public class BucketListAdapter extends RecyclerView.Adapter<BucketListAdapter.My
         TextView textBucketName,textBucketImagesSize;
         RadioButton radioButtonBucketSelect;
 
-        public MyViewHolder(View itemView) {
+        MyViewHolder(View itemView) {
             super(itemView);
             imageBucketCover = (ImageView) itemView.findViewById(R.id.imageBucketCover);
             textBucketName = (TextView) itemView.findViewById(R.id.textBucketName);

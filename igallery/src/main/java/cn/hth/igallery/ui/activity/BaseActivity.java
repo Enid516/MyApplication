@@ -2,7 +2,6 @@ package cn.hth.igallery.ui.activity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
 
 import com.enid.library.permission.PermissionActivity;
 

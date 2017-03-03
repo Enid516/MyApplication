@@ -30,7 +30,6 @@ public class ImageThumbnailJob implements Job{
         if (!thumbnailSmallFileName.exists()) {
             BitmapUtils.createThumbnailSmall(thumbnailSmallFileName,originalPath);
         }
-        Result result = Result.SUCCESS;
-        return result;
+        return Result.SUCCESS;
     }
 }

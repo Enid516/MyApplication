@@ -155,24 +155,21 @@ public class ImagePreviewActivity extends BaseActivity implements View.OnClickLi
 
         //设置checkBox 点击监听
         if (mConfiguration.getChoiceModel() == Configuration.ImageChoiceModel.MULTIPLE) {
-            checkBox.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    LogUtil.i("checkBox is checked :" + checkBox.isChecked());
-                    ImageModel imageModel = previewList.get(mCurrentIndex);
-                    if (checkBox.isChecked()) {
-                        String message = mConfiguration.addSelectImage(imageModel);
-                        if (!TextUtils.isEmpty(message)) {
-                            Toast.makeText(ImagePreviewActivity.this, message, Toast.LENGTH_SHORT).show();
-                        }
-                        if (!mConfiguration.getSelectedList().contains(imageModel)) {
-                            checkBox.setChecked(false);
-                        }
-                    } else {
-                        mConfiguration.removeSelectImage(imageModel);
+            checkBox.setOnClickListener(v -> {
+                LogUtil.i("checkBox is checked :" + checkBox.isChecked());
+                ImageModel imageModel = previewList.get(mCurrentIndex);
+                if (checkBox.isChecked()) {
+                    String message = mConfiguration.addSelectImage(imageModel);
+                    if (!TextUtils.isEmpty(message)) {
+                        Toast.makeText(ImagePreviewActivity.this, message, Toast.LENGTH_SHORT).show();
                     }
-                    btnOK.setText(GalleryUtil.getBtnOKString(mConfiguration.getSelectedList().size(), mConfiguration.getMaxChoiceSize()));
+                    if (!mConfiguration.getSelectedList().contains(imageModel)) {
+                        checkBox.setChecked(false);
+                    }
+                } else {
+                    mConfiguration.removeSelectImage(imageModel);
                 }
+                btnOK.setText(GalleryUtil.getBtnOKString(mConfiguration.getSelectedList().size(), mConfiguration.getMaxChoiceSize()));
             });
         }
     }
@@ -248,11 +245,6 @@ public class ImagePreviewActivity extends BaseActivity implements View.OnClickLi
                 layoutTop.setAnimation(animationTopIn);
                 layoutBottom.setAnimation(animationBottomIn);
             }
-        }
-
-        @Override
-        public void onOutsidePhotoTap() {
-
         }
     }
 

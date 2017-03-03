@@ -1,18 +1,12 @@
 package cn.hth.igallery.ui.activity;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -37,7 +31,6 @@ import cn.hth.igallery.Configuration;
 import cn.hth.igallery.MediaScannerHelper;
 import cn.hth.igallery.R;
 import cn.hth.igallery.anim.Animation;
-import cn.hth.igallery.anim.AnimationListener;
 import cn.hth.igallery.anim.SlideInUnderneathAnimation;
 import cn.hth.igallery.anim.SlideOutUnderneathAnimation;
 import cn.hth.igallery.model.BucketModel;
@@ -56,9 +49,7 @@ import rx.Observer;
  * scanner image for select
  */
 public class ImageGridActivity extends BaseActivity implements View.OnClickListener {
-    private Activity mContext;
     public static final String EXTRA_CONFIGURATION = "extra_configuration";
-    private RecyclerView recyclerView;
     private ImageGridAdapter imageGridAdapter;
     private static final int REQUEST_CODE = 0x1001;
     private Button btnOK;
@@ -67,14 +58,12 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
     private RecyclerView recyclerViewBucket;
     private LinearLayout layoutBucketOverview;
 
-    private int mCurrentPage = 0;
     private static final int MAX_LIMIT = 50;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.act_image_grid);
-        mContext = this;
         init();
     }
 
@@ -86,7 +75,7 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
 
     private void init() {
         //init view
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         btnOK = (Button) findViewById(R.id.btnOK);
         btnAllImage = (TextView) findViewById(R.id.btnAllImage);
@@ -104,8 +93,7 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
 
         //get intent data
         Bundle bundle = getIntent().getExtras();
-        Configuration configuration = (Configuration) bundle.getSerializable(EXTRA_CONFIGURATION);
-        mConfiguration = configuration;
+        mConfiguration = (Configuration) bundle.getSerializable(EXTRA_CONFIGURATION);
 
         //set adapter
         imageGridAdapter = new ImageGridAdapter(this, mConfiguration);
@@ -169,12 +157,13 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
 
             @Override
             public void onNext(List<ImageModel> imageModels) {
-                mConfiguration.getImageList().addAll(imageModels);
+                mConfiguration.setImageList(imageModels);
                 imageGridAdapter.setData(mConfiguration);
                 imageGridAdapter.notifyDataSetChanged();
             }
         };
-        MediaScannerHelper.generateImagesWithBucketId(observer, this, bucketId,mCurrentPage + 1, MAX_LIMIT);
+        int mCurrentPage = 0;
+        MediaScannerHelper.generateImagesWithBucketId(observer, this, bucketId, mCurrentPage + 1, MAX_LIMIT);
     }
 
     private void getBuckets() {
@@ -195,17 +184,14 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
             @Override
             public void onNext(final List<BucketModel> bucketModels) {
                 bucketListAdapter = new BucketListAdapter(ImageGridActivity.this, bucketModels);
-                bucketListAdapter.setOnItemOnClickListener(new BucketListAdapter.OnItemOnClickListener() {
-                    @Override
-                    public void onItemClick(BucketModel bucketModel, int position) {
-                        if (!bucketModel.getBucketId().equals(bucketListAdapter.getSelectedBucket().getBucketId())) {
-                            bucketListAdapter.setSelectedBucket(bucketModel);
-                            bucketListAdapter.notifyDataSetChanged();
-                            btnAllImage.setText(bucketModels.get(position).getBucketName());
-                            getImagesWithBucketId(bucketModel.getBucketId());
-                        }
-                        showBucketOverview(false);
+                bucketListAdapter.setOnItemOnClickListener((bucketModel, position) -> {
+                    if (!bucketModel.getBucketId().equals(bucketListAdapter.getSelectedBucket().getBucketId())) {
+                        bucketListAdapter.setSelectedBucket(bucketModel);
+                        bucketListAdapter.notifyDataSetChanged();
+                        btnAllImage.setText(bucketModels.get(position).getBucketName());
+                        getImagesWithBucketId(bucketModel.getBucketId());
                     }
+                    showBucketOverview(false);
                 });
                 bucketListAdapter.setSelectedBucket(bucketModels.get(0));
                 recyclerViewBucket.setAdapter(bucketListAdapter);
@@ -310,18 +296,8 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(false);
         builder.setMessage("应用功能需要请求SD卡访问权限");
-        builder.setPositiveButton("同意", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                getImagesData();
-            }
-        });
-        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                finish();
-            }
-        });
+        builder.setPositiveButton("同意", (dialogInterface, i) -> getImagesData());
+        builder.setNegativeButton("取消", (dialogInterface, i) -> finish());
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
@@ -364,22 +340,14 @@ public class ImageGridActivity extends BaseActivity implements View.OnClickListe
             new SlideInUnderneathAnimation(recyclerViewBucket)
                     .setDirection(Animation.DIRECTION_DOWN)
                     .setDuration(Animation.DURATION_DEFAULT)
-                    .setListener(new AnimationListener() {
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
+                    .setListener(animation -> {
 
-                        }
                     }).animate();
         } else {
             new SlideOutUnderneathAnimation(recyclerViewBucket)
                     .setDirection(Animation.DIRECTION_DOWN)
                     .setDuration(Animation.DURATION_DEFAULT)
-                    .setListener(new AnimationListener() {
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            layoutBucketOverview.setVisibility(View.INVISIBLE);
-                        }
-                    }).animate();
+                    .setListener(animation -> layoutBucketOverview.setVisibility(View.INVISIBLE)).animate();
 
         }
     }
